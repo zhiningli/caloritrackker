@@ -1,9 +1,10 @@
 package com.caloriplanner.calorimeter.clos.controllers;
 
-
-import com.caloriplanner.calorimeter.clos.models.Food;
+import com.caloriplanner.calorimeter.clos.models.dto.FoodDto;
 import com.caloriplanner.calorimeter.clos.service.FoodService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,28 +16,27 @@ public class FoodController {
     @Autowired
     private FoodService foodService;
 
+    @PostMapping("/create")
+    public ResponseEntity<FoodDto> createFood(@RequestBody FoodDto foodDto){
+        FoodDto savedFoodDto = foodService.createFood(foodDto);
+        return new ResponseEntity<>(savedFoodDto, HttpStatus.CREATED);
+    }
+
     @GetMapping
-    public List<Food> getAllFoods() {
-        return foodService.getAllFoods();
+    public ResponseEntity<List<FoodDto>> getAllFood(){
+        List<FoodDto> foodsDto = foodService.getAllFoods();
+        return ResponseEntity.ok(foodsDto);
     }
 
     @GetMapping("/{name}")
-    public Food getFoodByName(@PathVariable String name) {
-        return foodService.getFoodByName(name);
-    }
-
-    @PostMapping
-    public Food saveFood(@RequestBody Food food) {
-        return foodService.saveFood(food);
+    public ResponseEntity<FoodDto> getFoodByName(@PathVariable("name") String name){
+        FoodDto foodDto = foodService.getFoodByName(name);
+        return ResponseEntity.ok(foodDto);
     }
 
     @DeleteMapping("/{name}")
-    public void deleteFood(@PathVariable String name) {
+    public ResponseEntity<String> deleteFood(@PathVariable("name") String name){
         foodService.deleteFood(name);
-    }
-
-    @PostMapping("/create")
-    public Food createFood(@RequestBody Food food) {
-        return foodService.createFood(food);
+        return ResponseEntity.ok("Food deleted successfully!");
     }
 }
