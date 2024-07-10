@@ -3,17 +3,19 @@ package com.caloriplanner.calorimeter.clos.models;
 import com.caloriplanner.calorimeter.clos.constants.FoodCategory;
 import com.caloriplanner.calorimeter.clos.constants.FoodConstants;
 import com.caloriplanner.calorimeter.clos.exceptions.InvalidInputException;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Document(collection = "foods")
 public class Food {
 
+    @Id
+    private String id;
     private String name;
     private FoodCategory category;
     private double caloriesPerGram;
@@ -24,12 +26,12 @@ public class Food {
 
     public void setWeight(double weight){
         if (weight <= FoodConstants.MIN_WEIGHT){
-            throw new InvalidInputException("Weight must be a positive number. ");
+            throw new InvalidInputException("Weight must be a positive number.");
         }
         this.weight = weight;
     }
 
-    //Method to calculate total nutritional values based on weight
+    // Method to calculate total nutritional values based on weight
     public double getTotalCalories(){
         return caloriesPerGram * weight;
     }
@@ -54,5 +56,4 @@ public class Food {
             throw new InvalidInputException("Weight must be a positive number.");
         }
     }
-
 }
