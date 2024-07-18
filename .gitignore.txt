@@ -1,0 +1,17 @@
+# Ignore node_modules
+frontend/node_modules/
+
+# Ignore build output
+frontend/build/
+
+# Ignore logs
+*.log
+
+# Ignore IntelliJ IDEA files
+.idea/
+
+# Ignore target folder
+backend/target/
+
+# Ignore .env files
+*.env
