@@ -52,13 +52,13 @@ class UserLoginServiceImplTest {
         User user = new User();
         user.setUsername("testuser");
 
-        when(userRepository.findByName("testuser")).thenReturn(user);
+        when(userRepository.findByUsername("testuser")).thenReturn(user);
 
         User foundUser = userLoginService.getUserByUsername("testuser");
 
         assertNotNull(foundUser);
         assertEquals("testuser", foundUser.getUsername());
-        verify(userRepository, times(1)).findByName("testuser");
+        verify(userRepository, times(1)).findByUsername("testuser");
     }
 
     @Test
@@ -67,24 +67,24 @@ class UserLoginServiceImplTest {
         user.setUsername("testuser");
         user.setPassword("encodedPassword123");
 
-        when(userRepository.findByName("testuser")).thenReturn(user);
+        when(userRepository.findByUsername("testuser")).thenReturn(user);
         when(passwordEncoder.matches("password123", "encodedPassword123")).thenReturn(true);
 
         boolean isAuthenticated = userLoginService.authenticateUser("testuser", "password123");
 
         assertTrue(isAuthenticated);
-        verify(userRepository, times(1)).findByName("testuser");
+        verify(userRepository, times(1)).findByUsername("testuser");
         verify(passwordEncoder, times(1)).matches("password123", "encodedPassword123");
     }
 
     @Test
     void authenticateUser_ShouldReturnFalseWhenUserNotFound() {
-        when(userRepository.findByName("testuser")).thenReturn(null);
+        when(userRepository.findByUsername("testuser")).thenReturn(null);
 
         boolean isAuthenticated = userLoginService.authenticateUser("testuser", "password123");
 
         assertFalse(isAuthenticated);
-        verify(userRepository, times(1)).findByName("testuser");
+        verify(userRepository, times(1)).findByUsername("testuser");
         verify(passwordEncoder, times(0)).matches(anyString(), anyString());
     }
 
@@ -94,13 +94,13 @@ class UserLoginServiceImplTest {
         user.setUsername("testuser");
         user.setPassword("encodedPassword123");
 
-        when(userRepository.findByName("testuser")).thenReturn(user);
+        when(userRepository.findByUsername("testuser")).thenReturn(user);
         when(passwordEncoder.matches("wrongPassword", "encodedPassword123")).thenReturn(false);
 
         boolean isAuthenticated = userLoginService.authenticateUser("testuser", "wrongPassword");
 
         assertFalse(isAuthenticated);
-        verify(userRepository, times(1)).findByName("testuser");
+        verify(userRepository, times(1)).findByUsername("testuser");
         verify(passwordEncoder, times(1)).matches("wrongPassword", "encodedPassword123");
     }
 }

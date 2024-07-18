@@ -33,7 +33,7 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository){
         return username -> {
-            User user = userRepository.findByName(username);
+            User user = userRepository.findByUsername(username);
             if (user == null){
                 throw new UsernameNotFoundException("User not found");
             }
