@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -27,8 +29,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody User user) {
-        boolean isAuthenticated = userLoginService.authenticateUser(user.getUsername(), user.getPassword());
+    public ResponseEntity<String> loginUser(@RequestBody Map<String, String> credentials) {
+        String identifier = credentials.get("identifier");
+        String password = credentials.get("password");
+
+        boolean isAuthenticated = userLoginService.authenticateUser(identifier, password);
         if (isAuthenticated) {
             return ResponseEntity.ok("Login successful");
         } else {

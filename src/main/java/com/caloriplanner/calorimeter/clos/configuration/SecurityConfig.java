@@ -26,18 +26,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity
-                .authorizeHttpRequests(authorizeRequests ->
-                        authorizeRequests
-                                .requestMatchers("/api/users/register").permitAll() // Allow unauthenticated access to /register
-                                .anyRequest().authenticated()
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/api/users/register", "/api/users/login").permitAll() // Allow unauthenticated access to /register and /login
+                        .anyRequest().authenticated()
                 )
                 .cors(withDefaults()) // Enable CORS
-                .formLogin(formLogin ->
-                        formLogin
-                                .loginPage("/login")
-                                .permitAll()
-                )
-                .logout(logout -> logout.permitAll());
+                .formLogin(withDefaults()) // Enable default form login
+                .httpBasic(withDefaults()); // Enable basic authentication
         return http.build();
     }
 

@@ -67,30 +67,22 @@ class UserControllerTest {
 
     @Test
     void loginUser_ShouldReturnSuccessMessageWhenCredentialsAreCorrect() throws Exception {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword("password123");
-
         when(userLoginService.authenticateUser("testuser", "password123")).thenReturn(true);
 
         mockMvc.perform(post("/api/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"testuser\",\"password\":\"password123\"}"))
+                        .content("{\"identifier\":\"testuser\",\"password\":\"password123\"}"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("Login successful"));
     }
 
     @Test
     void loginUser_ShouldReturnUnauthorizedWhenCredentialsAreIncorrect() throws Exception {
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword("wrongpassword");
-
         when(userLoginService.authenticateUser("testuser", "wrongpassword")).thenReturn(false);
 
         mockMvc.perform(post("/api/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"testuser\",\"password\":\"wrongpassword\"}"))
+                        .content("{\"identifier\":\"testuser\",\"password\":\"wrongpassword\"}"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid credentials"));
     }

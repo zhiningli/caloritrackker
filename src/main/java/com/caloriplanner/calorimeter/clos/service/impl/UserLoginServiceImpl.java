@@ -32,8 +32,15 @@ public class UserLoginServiceImpl implements UserLoginService {
 
     @Override
     @Transactional(readOnly = true)
-    public boolean authenticateUser(String username, String password) {
-        User user = userRepository.findByUsername(username);
+    public User getUserByEmail(String email){return userRepository.findByEmail(email);}
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean authenticateUser(String identifier, String password) {
+        User user = userRepository.findByUsername(identifier);
+        if (user == null) {
+            user = userRepository.findByEmail(identifier);
+        }
         if (user != null) {
             return passwordEncoder.matches(password, user.getPassword());
         }
