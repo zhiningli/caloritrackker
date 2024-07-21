@@ -8,6 +8,7 @@ import com.caloriplanner.calorimeter.clos.repositories.FoodRepository;
 import com.caloriplanner.calorimeter.clos.service.FoodService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -18,6 +19,7 @@ public class FoodServiceImpl implements FoodService {
     private FoodRepository foodRepository;
 
     @Override
+    @Transactional
     public FoodDto createFood(FoodDto foodDto) {
         Food food = FoodMapper.mapToFood(foodDto);
         Food savedFood = foodRepository.save(food);
@@ -26,12 +28,14 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<FoodDto> getAllFoods(){
         List<Food> foods = foodRepository.findAll();
         return foods.stream().map(FoodMapper::mapToFoodDto).toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public FoodDto getFoodByName(String name) {
         Food food = foodRepository.findByName(name);
         if (food != null) {
@@ -42,6 +46,7 @@ public class FoodServiceImpl implements FoodService {
     }
 
     @Override
+    @Transactional
     public void deleteFood(String name) {
         Food food = foodRepository.findByName(name);
         if (food != null) {
