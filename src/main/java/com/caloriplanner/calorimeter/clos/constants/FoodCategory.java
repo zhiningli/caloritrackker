@@ -9,6 +9,7 @@ public enum FoodCategory {
     PROTEIN("protein"),
     DAIRY("dairy"),
     GRAIN("grain"),
+    COMPOSITE("composite"),
     OTHER("other");
 
     private final String value;
