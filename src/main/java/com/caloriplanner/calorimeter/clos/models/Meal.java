@@ -1,29 +1,45 @@
 package com.caloriplanner.calorimeter.clos.models;
 
-/*This class uses composite pattern to create a meal object made up of a list of foods*/
-
 import com.caloriplanner.calorimeter.clos.constants.FoodCategory;
 import com.caloriplanner.calorimeter.clos.exceptions.InvalidInputException;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
 import java.util.List;
 
+
+
+/**
+ * This class uses the composite pattern to create a meal object made up of a list of foods.
+ */
+
 @EqualsAndHashCode(callSuper = true)
 @Data
-@Builder
-@AllArgsConstructor
-@NoArgsConstructor
+@SuperBuilder
 @Document(collection = "meals")
 public class Meal extends Food {
 
+    @Singular
     private List<Food> foods = new ArrayList<>();
 
-    public Meal(String id, String name, FoodCategory category, double caloriesPerGram,
+    // This constructor is just to handle the mealDto
+    public Meal(String name, FoodCategory category, double caloriesPerGram,
                 double proteinsPerGram, double fatsPerGram, double carbsPerGram, double weight,
                 List<Food> foods) {
-        super(id, name, category, caloriesPerGram, proteinsPerGram, fatsPerGram, carbsPerGram, weight);
+        this.setName(name);
+        this.setCategory(category);
+        this.setCaloriesPerGram(caloriesPerGram);
+        this.setProteinsPerGram(proteinsPerGram);
+        this.setFatsPerGram(fatsPerGram);
+        this.setCarbsPerGram(carbsPerGram);
+        this.setWeight(weight);
+        this.foods = foods != null ? foods : new ArrayList<>();
+    }
+
+    // Constructor for an input of ArrayList
+    public Meal(List<Food> foods) {
         this.foods = foods != null ? foods : new ArrayList<>();
         calculateNutritionalValues();
     }
