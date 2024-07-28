@@ -9,19 +9,16 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 /**
  * This class uses the composite pattern to create a meal object made up of a list of foods.
  */
-
 @EqualsAndHashCode(callSuper = true)
 @Data
 @SuperBuilder
 @Document(collection = "meals")
 public class Meal extends Food {
 
-    @Singular
+    @Builder.Default
     private List<Food> foods = new ArrayList<>();
 
     // This constructor is just to handle the mealDto
@@ -36,6 +33,7 @@ public class Meal extends Food {
         this.setCarbsPerGram(carbsPerGram);
         this.setWeight(weight);
         this.foods = foods != null ? foods : new ArrayList<>();
+        calculateNutritionalValues();
     }
 
     // Constructor for an input of ArrayList
