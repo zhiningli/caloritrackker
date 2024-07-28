@@ -9,7 +9,7 @@ public interface MealService {
     MealDto createMeal(MealDto mealDto);
     List<MealDto> getAllMeal();
     MealDto getMealById(String id);
-    MealDto getMealByName(String id);
+    MealDto getMealByName(String name);
     MealDto updateMeal(String id, MealDto mealDto);
     void deleteMealById(String id);
     void deleteMealByName(String name);

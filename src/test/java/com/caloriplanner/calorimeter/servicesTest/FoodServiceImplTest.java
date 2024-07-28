@@ -6,7 +6,6 @@ import com.caloriplanner.calorimeter.clos.mapper.FoodMapper;
 import com.caloriplanner.calorimeter.clos.models.Food;
 import com.caloriplanner.calorimeter.clos.models.dto.FoodDto;
 import com.caloriplanner.calorimeter.clos.repositories.FoodRepository;
-import com.caloriplanner.calorimeter.clos.service.FoodService;
 import com.caloriplanner.calorimeter.clos.service.impl.FoodServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -4,13 +4,14 @@ import com.caloriplanner.calorimeter.clos.constants.FoodCategory;
 import com.caloriplanner.calorimeter.clos.constants.FoodConstants;
 import com.caloriplanner.calorimeter.clos.exceptions.InvalidInputException;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @Document(collection = "foods")
 public class Food {
 
