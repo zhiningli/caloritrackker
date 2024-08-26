@@ -1,6 +1,7 @@
 package com.caloriplanner.calorimeter.controllersTest;
 
 import com.caloriplanner.calorimeter.clos.controllers.UserController;
+import com.caloriplanner.calorimeter.clos.helpers.JwtUtil;
 import com.caloriplanner.calorimeter.clos.models.User;
 import com.caloriplanner.calorimeter.clos.service.UserLoginService;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,9 @@ class UserControllerTest {
 
     @MockBean
     private UserLoginService userLoginService;
+
+    @MockBean
+    private JwtUtil jwtUtil;
 
     @InjectMocks
     private UserController userController;
@@ -66,14 +70,20 @@ class UserControllerTest {
     }
 
     @Test
-    void loginUser_ShouldReturnSuccessMessageWhenCredentialsAreCorrect() throws Exception {
+    void loginUser_ShouldReturnJwtTokenWhenCredentialsAreCorrect() throws Exception {
+        User user = new User();
+        user.setUsername("testuser");
+        user.setPassword("password123");
+
         when(userLoginService.authenticateUser("testuser", "password123")).thenReturn(true);
+        when(userLoginService.getUserByUsername("testuser")).thenReturn(user);
+        when(jwtUtil.generateToken(user)).thenReturn("mocked-jwt-token");
 
         mockMvc.perform(post("/api/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"identifier\":\"testuser\",\"password\":\"password123\"}"))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Login successful"));
+                .andExpect(jsonPath("$.Token").value("mocked-jwt-token"));
     }
 
     @Test
@@ -107,5 +117,4 @@ class UserControllerTest {
                 .andExpect(content().string("false"));
     }
 }
-
 
