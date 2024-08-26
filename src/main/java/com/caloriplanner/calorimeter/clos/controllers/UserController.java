@@ -40,4 +40,10 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
     }
+
+    @GetMapping("/check-slug/{slug}")
+    public ResponseEntity<Boolean> checkSlugExists(@PathVariable String slug) {
+        boolean exists = userLoginService.checkSlugExists(slug);
+        return new ResponseEntity<>(exists, HttpStatus.OK);
+    }
 }

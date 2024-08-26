@@ -1,5 +1,6 @@
 package com.caloriplanner.calorimeter.clos.service.impl;
 
+import com.caloriplanner.calorimeter.clos.helpers.SlugHelper;
 import com.caloriplanner.calorimeter.clos.models.User;
 import com.caloriplanner.calorimeter.clos.repositories.UserRepository;
 import com.caloriplanner.calorimeter.clos.service.UserLoginService;
@@ -17,11 +18,25 @@ public class UserLoginServiceImpl implements UserLoginService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private SlugHelper slugHelper;
+
     @Override
     @Transactional
     public User registerUser(User user) {
+
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+
+        String baseSlug = slugHelper.generateSlug(user.getUsername());
+        String uniqueSlug = slugHelper.ensureSlugUnique(baseSlug);
+        user.setSlug(uniqueSlug);
         return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public boolean checkSlugExists(String slug){
+        return slugHelper.checkSlugExists(slug);
     }
 
     @Override

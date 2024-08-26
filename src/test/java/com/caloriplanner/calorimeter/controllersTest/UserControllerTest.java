@@ -86,5 +86,26 @@ class UserControllerTest {
                 .andExpect(status().isUnauthorized())
                 .andExpect(content().string("Invalid credentials"));
     }
+
+    @Test
+    void checkSlugExists_ShouldReturnTrueWhenSlugExists() throws Exception {
+        when(userLoginService.checkSlugExists("existing-slug")).thenReturn(true);
+
+        mockMvc.perform(get("/api/users/check-slug/existing-slug")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"));
+    }
+
+    @Test
+    void checkSlugExists_ShouldReturnFalseWhenSlugDoesNotExist() throws Exception {
+        when(userLoginService.checkSlugExists("non-existing-slug")).thenReturn(false);
+
+        mockMvc.perform(get("/api/users/check-slug/non-existing-slug")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().string("false"));
+    }
 }
+
 

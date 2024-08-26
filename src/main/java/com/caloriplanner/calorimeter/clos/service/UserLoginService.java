@@ -8,4 +8,5 @@ public interface UserLoginService {
     User getUserByUsername(String username);
     User getUserByEmail(String email);
     boolean authenticateUser(String identifier, String password);
+    boolean checkSlugExists(String slug);
 }
