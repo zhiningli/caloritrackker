@@ -19,5 +19,6 @@ public class MealDto {
     private double fatsPerGram;
     private double carbsPerGram;
     private double weight;
-    private List<Food> foods;
+    private List<String> foods;
+
 }

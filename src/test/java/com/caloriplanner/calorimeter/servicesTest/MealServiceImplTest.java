@@ -6,6 +6,7 @@ import com.caloriplanner.calorimeter.clos.mapper.MealMapper;
 import com.caloriplanner.calorimeter.clos.models.Food;
 import com.caloriplanner.calorimeter.clos.models.Meal;
 import com.caloriplanner.calorimeter.clos.models.dto.MealDto;
+import com.caloriplanner.calorimeter.clos.repositories.FoodRepository;
 import com.caloriplanner.calorimeter.clos.repositories.MealRepository;
 import com.caloriplanner.calorimeter.clos.service.impl.MealServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,17 +18,20 @@ import org.mockito.MockitoAnnotations;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-
 public class MealServiceImplTest {
 
     @Mock
     private MealRepository mealRepository;
+
+    @Mock
+    private FoodRepository foodRepository;
 
     @InjectMocks
     private MealServiceImpl mealService;
@@ -38,7 +42,11 @@ public class MealServiceImplTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
+
+        MealMapper mealMapper = new MealMapper(foodRepository);
+
         Food apple = new Food();
+        apple.setId("1");
         apple.setName("Apple");
         apple.setCategory(FoodCategory.FRUIT);
         apple.setCaloriesPerGram(0.52);
@@ -48,6 +56,7 @@ public class MealServiceImplTest {
         apple.setWeight(150);
 
         Food banana = new Food();
+        banana.setId("2");
         banana.setName("Banana");
         banana.setCategory(FoodCategory.FRUIT);
         banana.setCaloriesPerGram(0.89);
@@ -57,15 +66,44 @@ public class MealServiceImplTest {
         banana.setWeight(120);
 
         List<Food> foodList = Arrays.asList(apple, banana);
-        meal = new Meal(foodList);
-        meal.setId("1");
-        meal.setName("Fruit Salad");
+        meal = new Meal("Fruit Salad", FoodCategory.FRUIT, foodList);
 
-        mealDto = MealMapper.mapToMealDto(meal);
+        // Create MealDto using Food IDs
+        mealDto = MealDto.builder()
+                .name(meal.getName())
+                .category(meal.getCategory())
+                .foods(foodList.stream().map(Food::getId).collect(Collectors.toList()))  // Store only Food IDs
+                .build();
     }
 
     @Test
     void createMealTest() {
+        // Mocking the Food objects that will be returned by the FoodRepository
+        Food apple = new Food();
+        apple.setId("1");
+        apple.setName("Apple");
+        apple.setCategory(FoodCategory.FRUIT);
+        apple.setCaloriesPerGram(0.52);
+        apple.setProteinsPerGram(0.03);
+        apple.setFatsPerGram(0.002);
+        apple.setCarbsPerGram(0.14);
+        apple.setWeight(150);
+
+        Food banana = new Food();
+        banana.setId("2");
+        banana.setName("Banana");
+        banana.setCategory(FoodCategory.FRUIT);
+        banana.setCaloriesPerGram(0.89);
+        banana.setProteinsPerGram(0.011);
+        banana.setFatsPerGram(0.003);
+        banana.setCarbsPerGram(0.23);
+        banana.setWeight(120);
+
+        // Mock the findById calls in foodRepository to return the above Food objects
+        when(foodRepository.findById("1")).thenReturn(Optional.of(apple));
+        when(foodRepository.findById("2")).thenReturn(Optional.of(banana));
+
+        // Mock saving the Meal
         when(mealRepository.save(any(Meal.class))).thenReturn(meal);
 
         MealDto savedMealDto = mealService.createMeal(mealDto);
@@ -73,6 +111,8 @@ public class MealServiceImplTest {
         assertNotNull(savedMealDto);
         assertEquals(mealDto.getName(), savedMealDto.getName());
         verify(mealRepository, times(1)).save(any(Meal.class));
+        verify(foodRepository, times(1)).findById("1");
+        verify(foodRepository, times(1)).findById("2");
     }
 
     @Test
@@ -114,16 +154,46 @@ public class MealServiceImplTest {
 
     @Test
     void updateMealTest() {
+        // Creating food items with valid weights
+        Food apple = new Food();
+        apple.setId("1");
+        apple.setName("Apple");
+        apple.setCategory(FoodCategory.FRUIT);
+        apple.setCaloriesPerGram(0.52);
+        apple.setProteinsPerGram(0.03);
+        apple.setFatsPerGram(0.002);
+        apple.setCarbsPerGram(0.14);
+        apple.setWeight(150); // Valid weight
+
+        Food banana = new Food();
+        banana.setId("2");
+        banana.setName("Banana");
+        banana.setCategory(FoodCategory.FRUIT);
+        banana.setCaloriesPerGram(0.89);
+        banana.setProteinsPerGram(0.011);
+        banana.setFatsPerGram(0.003);
+        banana.setCarbsPerGram(0.23);
+        banana.setWeight(120); // Valid weight
+
+        // Adding these foods to the meal
+        meal.setFoods(Arrays.asList(apple, banana));
+        meal.setWeight(apple.getWeight() + banana.getWeight()); // Summing up the weights
+
+        // Setting up mocks
+        when(foodRepository.findById("1")).thenReturn(Optional.of(apple));
+        when(foodRepository.findById("2")).thenReturn(Optional.of(banana));
         when(mealRepository.findById(anyString())).thenReturn(Optional.of(meal));
         when(mealRepository.save(any(Meal.class))).thenReturn(meal);
 
+        // Running the update method
         MealDto updatedMealDto = mealService.updateMeal("1", mealDto);
 
+        // Validating results
         assertNotNull(updatedMealDto);
         assertEquals(mealDto.getName(), updatedMealDto.getName());
         verify(mealRepository, times(1)).findById(anyString());
-        verify(mealRepository, times(1)).save(any(Meal.class));
-    }
+        verify(mealRepository, times(1)).save(any(Meal.class));}
+
 
     @Test
     void updateMealNotFoundTest() {

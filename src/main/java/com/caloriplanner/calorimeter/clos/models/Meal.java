@@ -2,43 +2,46 @@ package com.caloriplanner.calorimeter.clos.models;
 
 import com.caloriplanner.calorimeter.clos.constants.FoodCategory;
 import com.caloriplanner.calorimeter.clos.exceptions.InvalidInputException;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class uses the composite pattern to create a meal object made up of a list of foods.
+ * This class represents a meal made up of a list of foods.
  */
-@EqualsAndHashCode(callSuper = true)
 @Data
-@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Document(collection = "meals")
-public class Meal extends Food {
+public class Meal {
 
-    @Builder.Default
-    private List<Food> foods = new ArrayList<>();
+    @Id
+    private String id;
 
-    // This constructor is just to handle the mealDto
-    public Meal(String name, FoodCategory category, double caloriesPerGram,
-                double proteinsPerGram, double fatsPerGram, double carbsPerGram, double weight,
-                List<Food> foods) {
-        this.setName(name);
-        this.setCategory(category);
-        this.setCaloriesPerGram(caloriesPerGram);
-        this.setProteinsPerGram(proteinsPerGram);
-        this.setFatsPerGram(fatsPerGram);
-        this.setCarbsPerGram(carbsPerGram);
-        this.setWeight(weight);
-        this.foods = foods != null ? foods : new ArrayList<>();
-        calculateNutritionalValues();
-    }
+    private String name;
+    private FoodCategory category;
 
-    // Constructor for an input of ArrayList
-    public Meal(List<Food> foods) {
-        this.foods = foods != null ? foods : new ArrayList<>();
+    @DBRef(lazy = false)
+    private List<Food> foods;  // Reference to Food objects
+
+    private double caloriesPerGram;
+    private double proteinsPerGram;
+    private double fatsPerGram;
+    private double carbsPerGram;
+    private double weight;
+
+    // Constructor for handling MealDto
+    public Meal(String name, FoodCategory category, List<Food> foods) {
+        this.name = name;
+        this.category = category;
+        this.foods = foods;
         calculateNutritionalValues();
     }
 
@@ -52,13 +55,14 @@ public class Meal extends Food {
         calculateNutritionalValues();
     }
 
-    @Override
     public void validate() {
-        super.validate();
         if (foods == null || foods.isEmpty()) {
             throw new InvalidInputException("Meal must contain at least one food item.");
         }
         foods.forEach(Food::validate);
+        if (weight <= 0) {
+            throw new InvalidInputException("Total weight must be greater than 0");
+        }
     }
 
     private void calculateNutritionalValues() {
@@ -77,13 +81,14 @@ public class Meal extends Food {
         }
 
         if (totalWeight > 0) {
-            this.setCaloriesPerGram(totalCalories / totalWeight);
-            this.setProteinsPerGram(totalProteins / totalWeight);
-            this.setFatsPerGram(totalFats / totalWeight);
-            this.setCarbsPerGram(totalCarbs / totalWeight);
-            this.setWeight(totalWeight);
+            this.caloriesPerGram = totalCalories / totalWeight;
+            this.proteinsPerGram = totalProteins / totalWeight;
+            this.fatsPerGram = totalFats / totalWeight;
+            this.carbsPerGram = totalCarbs / totalWeight;
+            this.weight = totalWeight;
         } else {
             throw new InvalidInputException("Total weight must be greater than 0");
         }
     }
 }
+

@@ -23,7 +23,7 @@ public class Food {
     private double proteinsPerGram;
     private double fatsPerGram;
     private double carbsPerGram;
-    private double weight; // This field is for user input and can change
+    private double weight;
 
     public void setWeight(double weight) {
         if (weight <= FoodConstants.MIN_WEIGHT) {

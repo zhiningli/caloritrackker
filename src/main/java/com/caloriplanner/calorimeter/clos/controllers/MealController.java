@@ -17,32 +17,32 @@ public class MealController {
     private MealService mealService;
 
     @PostMapping
-    public ResponseEntity<MealDto> createMeal(MealDto mealDto){
+    public ResponseEntity<MealDto> createMeal(@RequestBody MealDto mealDto) {
         MealDto createdMeal = mealService.createMeal(mealDto);
         return new ResponseEntity<>(createdMeal, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<MealDto>> getAllMeals(){
+    public ResponseEntity<List<MealDto>> getAllMeals() {
         List<MealDto> meals = mealService.getAllMeal();
-        return ResponseEntity.ok(meals);
+        return new ResponseEntity<>(meals, HttpStatus.OK);
     }
 
-    @GetMapping("{id}")
-    public ResponseEntity<MealDto> getMealById(@PathVariable("id") String id){
+    @GetMapping("/{id}")
+    public ResponseEntity<MealDto> getMealById(@PathVariable String id) {
         MealDto meal = mealService.getMealById(id);
-        return ResponseEntity.ok(meal);
+        return new ResponseEntity<>(meal, HttpStatus.OK);
     }
 
-    @PutMapping("{id}")
-    public ResponseEntity<MealDto> updateMeal(@PathVariable("id") String id, @RequestBody MealDto mealDto){
+    @PutMapping("/{id}")
+    public ResponseEntity<MealDto> updateMeal(@PathVariable String id, @RequestBody MealDto mealDto) {
         MealDto updatedMeal = mealService.updateMeal(id, mealDto);
-        return ResponseEntity.ok(updatedMeal);
+        return new ResponseEntity<>(updatedMeal, HttpStatus.OK);
     }
 
-    @DeleteMapping("{id}")
-    public ResponseEntity<String> deleteById(@PathVariable("id") String id){
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteMealById(@PathVariable String id) {
         mealService.deleteMealById(id);
-        return ResponseEntity.ok("Meal deleted successfully!");
+        return new ResponseEntity<>("Meal deleted successfully!", HttpStatus.OK);
     }
 }

@@ -62,7 +62,6 @@ public class MealServiceImpl implements MealService {
         meal.setProteinsPerGram(mealDto.getProteinsPerGram());
         meal.setFatsPerGram(mealDto.getFatsPerGram());
         meal.setCarbsPerGram(mealDto.getCarbsPerGram());
-        meal.setWeight(mealDto.getWeight());
         Meal updatedMeal = mealRepository.save(meal);
         return MealMapper.mapToMealDto(updatedMeal);
     }

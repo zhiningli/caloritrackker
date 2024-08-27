@@ -26,7 +26,6 @@ public class UserLoginServiceImpl implements UserLoginService {
     public User registerUser(User user) {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
         String baseSlug = slugHelper.generateSlug(user.getUsername());
         String uniqueSlug = slugHelper.ensureSlugUnique(baseSlug);
         user.setSlug(uniqueSlug);
