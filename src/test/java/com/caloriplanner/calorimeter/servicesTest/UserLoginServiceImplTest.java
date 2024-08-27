@@ -1,5 +1,6 @@
 package com.caloriplanner.calorimeter.servicesTest;
 
+import com.caloriplanner.calorimeter.clos.helpers.SlugHelper;
 import com.caloriplanner.calorimeter.clos.models.User;
 import com.caloriplanner.calorimeter.clos.repositories.UserRepository;
 import com.caloriplanner.calorimeter.clos.service.impl.UserLoginServiceImpl;
@@ -22,13 +23,17 @@ class UserLoginServiceImplTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
+    @Mock
+    private SlugHelper slugHelper;
+
     @InjectMocks
-    private UserLoginServiceImpl userLoginService;
+    private UserLoginServiceImpl userLoginService;  // This will inject mocks into userLoginService
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
+
 
     @Test
     void registerUser_ShouldEncodePasswordAndSaveUser() {
@@ -37,14 +42,19 @@ class UserLoginServiceImplTest {
         user.setPassword("password123");
 
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword123");
+        when(slugHelper.generateSlug(anyString())).thenReturn("testuser-slug");
+        when(slugHelper.ensureSlugUnique(anyString())).thenReturn("testuser-slug");
         when(userRepository.save(any(User.class))).thenReturn(user);
 
         User registeredUser = userLoginService.registerUser(user);
 
         assertNotNull(registeredUser);
         assertEquals("encodedPassword123", registeredUser.getPassword());
+        assertEquals("testuser-slug", registeredUser.getSlug());
         verify(userRepository, times(1)).save(user);
         verify(passwordEncoder, times(1)).encode("password123");
+        verify(slugHelper, times(1)).generateSlug("testuser");
+        verify(slugHelper, times(1)).ensureSlugUnique("testuser-slug");
     }
 
     @Test
