@@ -4,6 +4,7 @@ import com.caloriplanner.calorimeter.clos.constants.FoodCategory;
 import com.caloriplanner.calorimeter.clos.models.Food;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -19,6 +20,6 @@ public class MealDto {
     private double fatsPerGram;
     private double carbsPerGram;
     private double weight;
-    private List<String> foods;
+    private List<String> foodNames = new ArrayList<>();
 
 }

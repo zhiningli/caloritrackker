@@ -57,4 +57,5 @@ public class Food {
             throw new InvalidInputException("Weight must be a positive number.");
         }
     }
+
 }

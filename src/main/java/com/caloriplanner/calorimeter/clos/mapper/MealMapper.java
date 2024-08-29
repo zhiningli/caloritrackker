@@ -6,21 +6,22 @@ import com.caloriplanner.calorimeter.clos.models.dto.MealDto;
 import com.caloriplanner.calorimeter.clos.models.Food;
 import com.caloriplanner.calorimeter.clos.repositories.FoodRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class MealMapper {
 
-    private static FoodRepository foodRepository = null;
+    private final FoodRepository foodRepository;
 
-    // Constructor injection
+    @Autowired
     public MealMapper(FoodRepository foodRepository) {
-        MealMapper.foodRepository = foodRepository;
+        this.foodRepository = foodRepository;
     }
 
-    public static MealDto mapToMealDto(Meal meal) {
+    public MealDto mapToMealDto(Meal meal) {
         return MealDto.builder()
                 .name(meal.getName())
                 .category(meal.getCategory())
@@ -29,27 +30,30 @@ public class MealMapper {
                 .fatsPerGram(meal.getFatsPerGram())
                 .carbsPerGram(meal.getCarbsPerGram())
                 .weight(meal.getWeight())
-                .foods(meal.getFoods().stream()
-                        .map(Food::getId)
+                .foodNames(meal.getFoods().stream()
+                        .map(Food::getName)
                         .collect(Collectors.toList()))
                 .build();
     }
 
-    public static Meal mapToMeal(MealDto mealDto) {
-        // Create an empty list to hold the Food objects
-        List<Food> foods = new ArrayList<>();
-
-        for (String foodId : mealDto.getFoods()) {
-            Food food = foodRepository.findById(foodId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Food with id " + foodId + " not found"));
-
-            foods.add(food);
+    public Meal mapToMeal(MealDto mealDto) {
+        if (mealDto.getFoodNames() == null || mealDto.getFoodNames().isEmpty()) {
+            throw new IllegalArgumentException("Meal must contain at least one food name.");
         }
+
+        List<Food> foods = mealDto.getFoodNames().stream()
+                .map(foodName -> {
+                    Food food = foodRepository.findByName(foodName);
+                    if (food == null) {
+                        throw new ResourceNotFoundException("Food not found with name: " + foodName);
+                    }
+                    return food;
+                })
+                .collect(Collectors.toList());
 
         return new Meal(mealDto.getName(),
                 mealDto.getCategory(),
                 foods);
     }
 }
-
 

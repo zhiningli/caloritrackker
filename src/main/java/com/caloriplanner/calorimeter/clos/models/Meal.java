@@ -10,6 +10,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,7 +30,7 @@ public class Meal {
     private FoodCategory category;
 
     @DBRef(lazy = false)
-    private List<Food> foods;  // Reference to Food objects
+    private List<Food> foods = new ArrayList<>();  // Initialize with an empty list to avoid NullPointerExceptions
 
     private double caloriesPerGram;
     private double proteinsPerGram;
@@ -41,17 +42,29 @@ public class Meal {
     public Meal(String name, FoodCategory category, List<Food> foods) {
         this.name = name;
         this.category = category;
-        this.foods = foods;
-        calculateNutritionalValues();
+        this.setFoods(foods);  // Use setter to ensure proper validation and calculation
     }
 
     public void addFood(Food food) {
+        if (foods == null) {
+            foods = new ArrayList<>();  // Ensure foods list is initialized
+        }
         foods.add(food);
         calculateNutritionalValues();
     }
 
     public void removeFood(Food food) {
-        foods.remove(food);
+        if (foods != null) {
+            foods.remove(food);
+            calculateNutritionalValues();
+        }
+    }
+
+    public void setFoods(List<Food> foods) {
+        if (foods == null || foods.isEmpty()) {
+            throw new InvalidInputException("Meal must contain at least one food item.");
+        }
+        this.foods = foods;
         calculateNutritionalValues();
     }
 
@@ -91,4 +104,3 @@ public class Meal {
         }
     }
 }
-

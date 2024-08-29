@@ -22,13 +22,16 @@ public class UserMealServiceImpl implements UserMealService {
     @Autowired
     private UserMealRepository userMealRepository;
 
+    @Autowired
+    private MealMapper mealMapper;
+
     @Override
     @Transactional
     public void createUserMeal(String userId, MealDto mealDto, double weight) {
         Meal meal = mealRepository.findByName(mealDto.getName());
 
         if (meal == null) {
-            meal = MealMapper.mapToMeal(mealDto);
+            meal = mealMapper.mapToMeal(mealDto);
             meal = mealRepository.save(meal);
         }
 
