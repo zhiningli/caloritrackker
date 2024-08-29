@@ -38,10 +38,32 @@ public class UserController {
         String password = credentials.get("password");
 
         boolean isAuthenticated = userLoginService.authenticateUser(identifier, password);
+        System.out.println("The authentication has been successful?" + identifier);
+
         if (isAuthenticated) {
+            // Try to retrieve the user by username or email
+            System.out.println("The identifier is" + identifier);
             User user = userLoginService.getUserByUsername(identifier);
-            String token = jwtUtil.generateToken(user);
-            return ResponseEntity.ok(Map.of("Token", token));
+            if (user == null) {
+                System.out.println("The identifier is not a username, searching for email" + identifier);
+                user = userLoginService.getUserByEmail(identifier);
+                System.out.println("Let me see how does this look like" + user);
+            }
+
+            // Ensure user is not null before proceeding
+            if (user != null) {
+                String token = jwtUtil.generateToken(user);
+                System.out.println("User found: " + user.getUsername() + ", Slug: " + user.getSlug());
+
+                // Include the slug in the response
+                return ResponseEntity.ok(Map.of(
+                        "Token", token,
+                        "username", user.getUsername(),
+                        "slug", user.getSlug()
+                ));
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found after authentication");
+            }
         } else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
