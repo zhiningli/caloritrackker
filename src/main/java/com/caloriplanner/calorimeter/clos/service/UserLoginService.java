@@ -1,6 +1,7 @@
 package com.caloriplanner.calorimeter.clos.service;
 
 import com.caloriplanner.calorimeter.clos.models.User;
+import com.caloriplanner.calorimeter.clos.models.dto.UserDto;
 
 public interface UserLoginService {
 
