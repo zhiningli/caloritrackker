@@ -23,7 +23,6 @@ public class FoodServiceImpl implements FoodService {
     public FoodDto createFood(FoodDto foodDto) {
         Food food = FoodMapper.mapToFood(foodDto);
         Food savedFood = foodRepository.save(food);
-
         return FoodMapper.mapToFoodDto(savedFood);
     }
 

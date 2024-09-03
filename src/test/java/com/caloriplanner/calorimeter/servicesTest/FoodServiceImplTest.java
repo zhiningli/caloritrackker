@@ -42,7 +42,6 @@ class FoodServiceImplTest {
         food.setProteinsPerGram(0.03);
         food.setFatsPerGram(0.002);
         food.setCarbsPerGram(0.14);
-        food.setWeight(150);
 
         foodDto = FoodMapper.mapToFoodDto(food);
     }

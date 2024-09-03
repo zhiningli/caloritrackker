@@ -45,7 +45,6 @@ class FoodControllerTest {
         foodDto.setProteinsPerGram(0.03);
         foodDto.setFatsPerGram(0.002);
         foodDto.setCarbsPerGram(0.14);
-        foodDto.setWeight(150);
     }
 
     @Test

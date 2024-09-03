@@ -14,7 +14,6 @@ public class FoodMapper {
                 .proteinsPerGram(food.getProteinsPerGram())
                 .fatsPerGram(food.getFatsPerGram())
                 .carbsPerGram(food.getCarbsPerGram())
-                .weight(food.getWeight())
                 .build();
     }
 
@@ -26,7 +25,6 @@ public class FoodMapper {
                 .proteinsPerGram(foodDto.getProteinsPerGram())
                 .fatsPerGram(foodDto.getFatsPerGram())
                 .carbsPerGram(foodDto.getCarbsPerGram())
-                .weight(foodDto.getWeight())
                 .build();
     }
 }

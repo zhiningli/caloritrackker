@@ -15,5 +15,4 @@ public class FoodDto {
     private double proteinsPerGram;
     private double fatsPerGram;
     private double carbsPerGram;
-    private double weight; // This field is for user input and can change
 }

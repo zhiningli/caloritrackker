@@ -10,12 +10,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-/**
- * This class represents a meal made up of a list of foods.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -30,7 +27,7 @@ public class Meal {
     private FoodCategory category;
 
     @DBRef(lazy = false)
-    private List<Food> foods = new ArrayList<>();  // Initialize with an empty list to avoid NullPointerExceptions
+    private Map<Food, Double> foods = new HashMap<>();
 
     private double caloriesPerGram;
     private double proteinsPerGram;
@@ -38,44 +35,20 @@ public class Meal {
     private double carbsPerGram;
     private double weight;
 
-    // Constructor for handling MealDto
-    public Meal(String name, FoodCategory category, List<Food> foods) {
+    @Builder
+    public Meal(String name, FoodCategory category, Map<Food, Double> foods) {
         this.name = name;
         this.category = category;
-        this.setFoods(foods);  // Use setter to ensure proper validation and calculation
-    }
-
-    public void addFood(Food food) {
-        if (foods == null) {
-            foods = new ArrayList<>();  // Ensure foods list is initialized
-        }
-        foods.add(food);
+        this.foods = foods != null ? foods : new HashMap<>();
         calculateNutritionalValues();
     }
 
-    public void removeFood(Food food) {
-        if (foods != null) {
-            foods.remove(food);
-            calculateNutritionalValues();
-        }
-    }
-
-    public void setFoods(List<Food> foods) {
+    public void setFoods(Map<Food, Double> foods) {
         if (foods == null || foods.isEmpty()) {
             throw new InvalidInputException("Meal must contain at least one food item.");
         }
         this.foods = foods;
         calculateNutritionalValues();
-    }
-
-    public void validate() {
-        if (foods == null || foods.isEmpty()) {
-            throw new InvalidInputException("Meal must contain at least one food item.");
-        }
-        foods.forEach(Food::validate);
-        if (weight <= 0) {
-            throw new InvalidInputException("Total weight must be greater than 0");
-        }
     }
 
     private void calculateNutritionalValues() {
@@ -85,12 +58,15 @@ public class Meal {
         double totalCarbs = 0;
         double totalWeight = 0;
 
-        for (Food food : foods) {
-            totalCalories += food.getTotalCalories();
-            totalProteins += food.getTotalProteins();
-            totalFats += food.getTotalFats();
-            totalCarbs += food.getTotalCarbs();
-            totalWeight += food.getWeight();
+        for (Map.Entry<Food, Double> entry : foods.entrySet()) {
+            Food food = entry.getKey();
+            double weight = entry.getValue();
+
+            totalCalories += food.getCaloriesPerGram() * weight;
+            totalProteins += food.getProteinsPerGram() * weight;
+            totalFats += food.getFatsPerGram() * weight;
+            totalCarbs += food.getCarbsPerGram() * weight;
+            totalWeight += weight;
         }
 
         if (totalWeight > 0) {
