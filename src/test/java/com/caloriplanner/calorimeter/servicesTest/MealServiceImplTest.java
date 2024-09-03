@@ -1,19 +1,19 @@
 package com.caloriplanner.calorimeter.servicesTest;
 
-import com.caloriplanner.calorimeter.clos.constants.FoodCategory;
 import com.caloriplanner.calorimeter.clos.exceptions.ResourceNotFoundException;
 import com.caloriplanner.calorimeter.clos.mapper.MealMapper;
-import com.caloriplanner.calorimeter.clos.models.Food;
 import com.caloriplanner.calorimeter.clos.models.Meal;
 import com.caloriplanner.calorimeter.clos.models.dto.MealDto;
-import com.caloriplanner.calorimeter.clos.repositories.FoodRepository;
+import com.caloriplanner.calorimeter.clos.models.Food;
 import com.caloriplanner.calorimeter.clos.repositories.MealRepository;
 import com.caloriplanner.calorimeter.clos.service.impl.MealServiceImpl;
+import com.caloriplanner.calorimeter.clos.constants.FoodCategory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+
 
 import java.util.*;
 
@@ -28,7 +28,7 @@ public class MealServiceImplTest {
     private MealRepository mealRepository;
 
     @Mock
-    private FoodRepository foodRepository;
+    private MealMapper mealMapper;
 
     @InjectMocks
     private MealServiceImpl mealService;
@@ -40,7 +40,10 @@ public class MealServiceImplTest {
     void setup() {
         MockitoAnnotations.openMocks(this);
 
-        MealMapper mealMapper = new MealMapper();
+        // Initialize Meal and MealDto
+        Map<String, Double> foodNames = new HashMap<>();
+        foodNames.put("Apple", 100.0);
+        foodNames.put("Banana", 50.0);
 
         Food apple = new Food();
         apple.setId("1");
@@ -60,63 +63,70 @@ public class MealServiceImplTest {
         banana.setFatsPerGram(0.003);
         banana.setCarbsPerGram(0.23);
 
-        Map<Food, Double> foodMap = new HashMap<>();
-        foodMap.put(apple, 100.0);
-        foodMap.put(banana, 50.0);
-        meal = new Meal("Fruit Salad", FoodCategory.FRUIT, foodMap);
+        mealDto = MealDto.builder()
+                .name("Fruit Salad")
+                .category(FoodCategory.FRUIT)
+                .caloriesPerGram(0.6)
+                .proteinsPerGram(0.02)
+                .fatsPerGram(0.01)
+                .carbsPerGram(0.14)
+                .foodNames(foodNames)
+                .build();
 
-        // Create MealDto using Food names and weights
-        mealDto = mealMapper.mapToMealDto(meal);
+        Map<Food, Double> foods = new HashMap<>();
+        foods.put(apple, 100.0);
+        foods.put(banana, 50.0);
+
+        meal = Meal.builder()
+                .name("Fruit Salad")
+                .category(FoodCategory.FRUIT)
+                .foods(foods)
+                .caloriesPerGram(0.6)
+                .proteinsPerGram(0.02)
+                .fatsPerGram(0.01)
+                .carbsPerGram(0.14)
+                .build();
     }
 
     @Test
     void createMealTest() {
-        // Mocking the Food objects that will be returned by the FoodRepository
-        Food apple = new Food();
-        apple.setId("1");
-        apple.setName("Apple");
-        apple.setCategory(FoodCategory.FRUIT);
-        apple.setCaloriesPerGram(0.52);
-        apple.setProteinsPerGram(0.03);
-        apple.setFatsPerGram(0.002);
-        apple.setCarbsPerGram(0.14);
-
-        Food banana = new Food();
-        banana.setId("2");
-        banana.setName("Banana");
-        banana.setCategory(FoodCategory.FRUIT);
-        banana.setCaloriesPerGram(0.89);
-        banana.setProteinsPerGram(0.011);
-        banana.setFatsPerGram(0.003);
-        banana.setCarbsPerGram(0.23);
-
-        // Mock the findById calls in foodRepository to return the above Food objects
-        when(foodRepository.findById("1")).thenReturn(Optional.of(apple));
-        when(foodRepository.findById("2")).thenReturn(Optional.of(banana));
-
-        // Mock saving the Meal
+        when(mealMapper.mapToMeal(any(MealDto.class))).thenReturn(meal);
         when(mealRepository.save(any(Meal.class))).thenReturn(meal);
+        when(mealMapper.mapToMealDto(any(Meal.class))).thenReturn(mealDto);
 
-        MealDto savedMealDto = mealService.createMeal(mealDto);
+        MealDto createdMealDto = mealService.createMeal(mealDto);
 
-        assertNotNull(savedMealDto);
-        assertEquals(mealDto.getName(), savedMealDto.getName());
-        assertEquals(mealDto.getFoodNames().size(), savedMealDto.getFoodNames().size());
-        assertEquals(mealDto.getFoodNames().get("Apple"), savedMealDto.getFoodNames().get("Apple"));
+        assertNotNull(createdMealDto);
+        assertEquals(mealDto.getName(), createdMealDto.getName());
         verify(mealRepository, times(1)).save(any(Meal.class));
-        verify(foodRepository, times(1)).findById("1");
-        verify(foodRepository, times(1)).findById("2");
+        verify(mealMapper, times(1)).mapToMeal(any(MealDto.class));
+        verify(mealMapper, times(1)).mapToMealDto(any(Meal.class));
     }
 
     @Test
     void getAllMealTest() {
-        when(mealRepository.findAll()).thenReturn(Arrays.asList(meal));
+        when(mealRepository.findAll()).thenReturn(Collections.singletonList(meal));
+        when(mealMapper.mapToMealDto(any(Meal.class))).thenReturn(mealDto);
 
         List<MealDto> mealDtos = mealService.getAllMeal();
 
         assertEquals(1, mealDtos.size());
-        assertEquals(meal.getName(), mealDtos.get(0).getName());
+        assertEquals(mealDto.getName(), mealDtos.get(0).getName());
         verify(mealRepository, times(1)).findAll();
+        verify(mealMapper, times(1)).mapToMealDto(any(Meal.class));
+    }
+
+    @Test
+    void getMealByIdTest() {
+        when(mealRepository.findById(anyString())).thenReturn(Optional.of(meal));
+        when(mealMapper.mapToMealDto(any(Meal.class))).thenReturn(mealDto);
+
+        MealDto foundMealDto = mealService.getMealById("1");
+
+        assertNotNull(foundMealDto);
+        assertEquals(mealDto.getName(), foundMealDto.getName());
+        verify(mealRepository, times(1)).findById(anyString());
+        verify(mealMapper, times(1)).mapToMealDto(any(Meal.class));
     }
 
     @Test
@@ -125,17 +135,20 @@ public class MealServiceImplTest {
 
         assertThrows(ResourceNotFoundException.class, () -> mealService.getMealById("1"));
         verify(mealRepository, times(1)).findById(anyString());
+        verify(mealMapper, never()).mapToMealDto(any(Meal.class));
     }
 
     @Test
     void getMealByNameTest() {
         when(mealRepository.findByName(anyString())).thenReturn(meal);
+        when(mealMapper.mapToMealDto(any(Meal.class))).thenReturn(mealDto);
 
         MealDto foundMealDto = mealService.getMealByName("Fruit Salad");
 
         assertNotNull(foundMealDto);
-        assertEquals(meal.getName(), foundMealDto.getName());
+        assertEquals(mealDto.getName(), foundMealDto.getName());
         verify(mealRepository, times(1)).findByName(anyString());
+        verify(mealMapper, times(1)).mapToMealDto(any(Meal.class));
     }
 
     @Test
@@ -144,51 +157,22 @@ public class MealServiceImplTest {
 
         assertThrows(ResourceNotFoundException.class, () -> mealService.getMealByName("Fruit Salad"));
         verify(mealRepository, times(1)).findByName(anyString());
+        verify(mealMapper, never()).mapToMealDto(any(Meal.class));
     }
 
     @Test
     void updateMealTest() {
-        // Creating food items with valid weights
-        Food apple = new Food();
-        apple.setId("1");
-        apple.setName("Apple");
-        apple.setCategory(FoodCategory.FRUIT);
-        apple.setCaloriesPerGram(0.52);
-        apple.setProteinsPerGram(0.03);
-        apple.setFatsPerGram(0.002);
-        apple.setCarbsPerGram(0.14);
-
-        Food banana = new Food();
-        banana.setId("2");
-        banana.setName("Banana");
-        banana.setCategory(FoodCategory.FRUIT);
-        banana.setCaloriesPerGram(0.89);
-        banana.setProteinsPerGram(0.011);
-        banana.setFatsPerGram(0.003);
-        banana.setCarbsPerGram(0.23);
-
-        Map<Food, Double> foodMap = new HashMap<>();
-
-        foodMap.put(apple, 100.0);
-        foodMap.put(banana, 50.0);
-        meal.setFoods(foodMap);
-
-        // Setting up mocks
-        when(foodRepository.findById("1")).thenReturn(Optional.of(apple));
-        when(foodRepository.findById("2")).thenReturn(Optional.of(banana));
         when(mealRepository.findById(anyString())).thenReturn(Optional.of(meal));
         when(mealRepository.save(any(Meal.class))).thenReturn(meal);
+        when(mealMapper.mapToMealDto(any(Meal.class))).thenReturn(mealDto);
 
-        // Running the update method
         MealDto updatedMealDto = mealService.updateMeal("1", mealDto);
 
-        // Validating results
         assertNotNull(updatedMealDto);
         assertEquals(mealDto.getName(), updatedMealDto.getName());
-        assertEquals(mealDto.getFoodNames().size(), updatedMealDto.getFoodNames().size());
-        assertEquals(mealDto.getFoodNames().get("Apple"), updatedMealDto.getFoodNames().get("Apple"));
         verify(mealRepository, times(1)).findById(anyString());
         verify(mealRepository, times(1)).save(any(Meal.class));
+        verify(mealMapper, times(1)).mapToMealDto(any(Meal.class));
     }
 
     @Test
@@ -197,6 +181,8 @@ public class MealServiceImplTest {
 
         assertThrows(ResourceNotFoundException.class, () -> mealService.updateMeal("1", mealDto));
         verify(mealRepository, times(1)).findById(anyString());
+        verify(mealRepository, never()).save(any(Meal.class));
+        verify(mealMapper, never()).mapToMealDto(any(Meal.class));
     }
 
     @Test
@@ -215,6 +201,7 @@ public class MealServiceImplTest {
 
         assertThrows(ResourceNotFoundException.class, () -> mealService.deleteMealById("1"));
         verify(mealRepository, times(1)).findById(anyString());
+        verify(mealRepository, never()).delete(any(Meal.class));
     }
 
     @Test
@@ -233,5 +220,6 @@ public class MealServiceImplTest {
 
         assertThrows(ResourceNotFoundException.class, () -> mealService.deleteMealByName("Fruit Salad"));
         verify(mealRepository, times(1)).findByName(anyString());
+        verify(mealRepository, never()).delete(any(Meal.class));
     }
 }

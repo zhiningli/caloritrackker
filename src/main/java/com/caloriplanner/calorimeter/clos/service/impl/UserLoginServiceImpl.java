@@ -28,7 +28,7 @@ public class UserLoginServiceImpl implements UserLoginService {
 
         System.out.println("Raw password: " + user.getPassword());
         String encodedPassword = passwordEncoder.encode(user.getPassword());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setPassword(encodedPassword);
 
         System.out.println("Encoded password: " + encodedPassword);
         String baseSlug = slugHelper.generateSlug(user.getUsername());
