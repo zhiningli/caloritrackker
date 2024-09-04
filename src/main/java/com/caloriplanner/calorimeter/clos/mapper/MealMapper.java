@@ -1,12 +1,11 @@
 package com.caloriplanner.calorimeter.clos.mapper;
 
 import com.caloriplanner.calorimeter.clos.exceptions.InvalidInputException;
-import com.caloriplanner.calorimeter.clos.exceptions.ResourceNotFoundException;
 import com.caloriplanner.calorimeter.clos.models.Meal;
+import com.caloriplanner.calorimeter.clos.models.dto.FoodDto;
 import com.caloriplanner.calorimeter.clos.models.dto.MealDto;
 import com.caloriplanner.calorimeter.clos.models.Food;
-import com.caloriplanner.calorimeter.clos.repositories.FoodRepository;
-import com.caloriplanner.calorimeter.clos.repositories.MealRepository;
+import com.caloriplanner.calorimeter.clos.service.impl.FoodServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,7 +17,10 @@ import java.util.UUID;
 public class MealMapper {
 
     @Autowired
-    FoodRepository foodRepository;
+    FoodServiceImpl foodService;
+
+    @Autowired
+    FoodMapper foodMapper;
 
     public MealDto mapToMealDto(Meal meal) {
         Map<String, Double> foodNames = new HashMap<>();
@@ -27,10 +29,7 @@ public class MealMapper {
             for (Map.Entry<String, Double> entry : meal.getFoods().entrySet()) {
                 String foodID = entry.getKey();
                 Double weight = entry.getValue();
-
-                Food food = foodRepository.findById(foodID)
-                        .orElseThrow(() -> new ResourceNotFoundException("Food not found with id: " + foodID));
-
+                FoodDto food = foodService.getFoodById(foodID);
                 String foodName = food.getName();
                 foodNames.put(foodName, weight);
             }
@@ -54,10 +53,8 @@ public class MealMapper {
                 String foodName = entry.getKey();
                 Double weight = entry.getValue();
 
-                Food food = foodRepository.findByName(foodName);
-                if (food == null) {
-                    throw new ResourceNotFoundException("Food not found with name: " + foodName);
-                }
+                FoodDto foodDto = foodService.getFoodByName(foodName);
+                Food food = foodMapper.mapToFood(foodDto);
 
                 String foodID = food.getId();
                 foods.put(foodID, weight);

@@ -25,6 +25,9 @@ class FoodServiceImplTest {
     @Mock
     private FoodRepository foodRepository;
 
+    @Mock
+    private FoodMapper foodMapper;
+
     @InjectMocks
     private FoodServiceImpl foodService;
 
@@ -43,7 +46,7 @@ class FoodServiceImplTest {
         food.setFatsPerGram(0.002);
         food.setCarbsPerGram(0.14);
 
-        foodDto = FoodMapper.mapToFoodDto(food);
+        foodDto = foodMapper.mapToFoodDto(food);
     }
 
     @Test

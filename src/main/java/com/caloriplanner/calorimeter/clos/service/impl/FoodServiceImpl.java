@@ -18,19 +18,22 @@ public class FoodServiceImpl implements FoodService {
     @Autowired
     private FoodRepository foodRepository;
 
+    @Autowired
+    private FoodMapper foodMapper;
+
     @Override
     @Transactional
     public FoodDto createFood(FoodDto foodDto) {
-        Food food = FoodMapper.mapToFood(foodDto);
+        Food food = foodMapper.mapToFood(foodDto);
         Food savedFood = foodRepository.save(food);
-        return FoodMapper.mapToFoodDto(savedFood);
+        return foodMapper.mapToFoodDto(savedFood);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<FoodDto> getAllFoods() {
         List<Food> foods = foodRepository.findAll();
-        return foods.stream().map(FoodMapper::mapToFoodDto).toList();
+        return foods.stream().map(foodMapper::mapToFoodDto).toList();
     }
 
     @Override
@@ -38,7 +41,7 @@ public class FoodServiceImpl implements FoodService {
     public FoodDto getFoodById(String id) {
         Food food = foodRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Food not found with id: " + id));
-        return FoodMapper.mapToFoodDto(food);
+        return foodMapper.mapToFoodDto(food);
     }
 
     @Override
@@ -46,7 +49,7 @@ public class FoodServiceImpl implements FoodService {
     public FoodDto getFoodByName(String name) {
         Food food = foodRepository.findByName(name);
         if (food != null) {
-            return FoodMapper.mapToFoodDto(food);
+            return foodMapper.mapToFoodDto(food);
         } else {
             throw new ResourceNotFoundException("Food not found with name: " + name);
         }
