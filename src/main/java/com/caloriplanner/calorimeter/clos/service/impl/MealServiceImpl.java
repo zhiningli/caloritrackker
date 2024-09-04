@@ -18,52 +18,49 @@ public class MealServiceImpl implements MealService {
     @Autowired
     MealRepository mealRepository;
 
+    @Autowired
+    MealMapper mealMapper;
+
     @Override
     @Transactional
     public MealDto createMeal(MealDto mealDto) {
-        Meal meal = MealMapper.mapToMeal(mealDto);
+        Meal meal = mealMapper.mapToMeal(mealDto);
         mealRepository.save(meal);
-        return MealMapper.mapToMealDto(meal);
+        return mealMapper.mapToMealDto(meal);
     }
 
     @Override
     @Transactional
     public List<MealDto> getAllMeal() {
         List<Meal> meals = mealRepository.findAll();
-        return meals.stream().map(MealMapper::mapToMealDto).toList();
+        return meals.stream().map(mealMapper::mapToMealDto).toList();
     }
 
     @Override
     public MealDto getMealById(String id){
         Meal meal = mealRepository.findById(id).orElseThrow(
                 () -> new ResourceNotFoundException("No meal with id "+id+" found!"));
-        return MealMapper.mapToMealDto(meal);
+        return mealMapper.mapToMealDto(meal);
     }
 
     @Override
     public MealDto getMealByName(String name) {
         Meal meal = mealRepository.findByName(name);
         if (meal != null){
-            return MealMapper.mapToMealDto(meal);
+            return mealMapper.mapToMealDto(meal);
         } else {
             throw new ResourceNotFoundException("No meal with name " + name + " found!");
         }
     }
 
     @Override
-    public MealDto updateMeal(String id, MealDto mealDto) {
-        Meal meal= mealRepository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("No meal with id " + id + "found! Unable to update meal.")
-        );
+    public MealDto updateMeal(MealDto mealDto){
 
-        meal.setName(mealDto.getName());
-        meal.setCategory(mealDto.getCategory());
-        meal.setCaloriesPerGram(mealDto.getCaloriesPerGram());
-        meal.setProteinsPerGram(mealDto.getProteinsPerGram());
-        meal.setFatsPerGram(mealDto.getFatsPerGram());
-        meal.setCarbsPerGram(mealDto.getCarbsPerGram());
-        Meal updatedMeal = mealRepository.save(meal);
-        return MealMapper.mapToMealDto(updatedMeal);
+        Meal oldMeal = mealRepository.findById(mealDto.getId()).orElseThrow(
+                () -> new ResourceNotFoundException("Error updating meals")
+        );
+        mealRepository.delete(oldMeal);
+        return createMeal(mealDto);
     }
 
     @Override

@@ -9,11 +9,11 @@ import lombok.*;
 @Builder
 public class FoodDto {
 
+    private String id;
     private String name;
     private FoodCategory category;
     private double caloriesPerGram;
     private double proteinsPerGram;
     private double fatsPerGram;
     private double carbsPerGram;
-    private double weight; // This field is for user input and can change
 }

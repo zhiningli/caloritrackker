@@ -8,13 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
-/**
- * This class represents a meal made up of a list of foods.
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,13 +21,14 @@ import java.util.List;
 public class Meal {
 
     @Id
-    private String id;
+    @Builder.Default
+    private String id = UUID.randomUUID().toString();
 
     private String name;
     private FoodCategory category;
 
-    @DBRef(lazy = false)
-    private List<Food> foods;  // Reference to Food objects
+    @Builder.Default
+    private Map<String, Double> foods = new HashMap<>();
 
     private double caloriesPerGram;
     private double proteinsPerGram;
@@ -37,58 +36,18 @@ public class Meal {
     private double carbsPerGram;
     private double weight;
 
-    // Constructor for handling MealDto
-    public Meal(String name, FoodCategory category, List<Food> foods) {
+    @Builder
+    public Meal(String name, FoodCategory category, Map<String, Double> foods, Double weight) {
         this.name = name;
         this.category = category;
-        this.foods = foods;
-        calculateNutritionalValues();
+        this.foods = foods != null ? foods : new HashMap<>();
+        this.weight = weight;
     }
 
-    public void addFood(Food food) {
-        foods.add(food);
-        calculateNutritionalValues();
-    }
-
-    public void removeFood(Food food) {
-        foods.remove(food);
-        calculateNutritionalValues();
-    }
-
-    public void validate() {
+    public void setFoods(Map<String, Double> foods) {
         if (foods == null || foods.isEmpty()) {
             throw new InvalidInputException("Meal must contain at least one food item.");
         }
-        foods.forEach(Food::validate);
-        if (weight <= 0) {
-            throw new InvalidInputException("Total weight must be greater than 0");
-        }
-    }
-
-    private void calculateNutritionalValues() {
-        double totalCalories = 0;
-        double totalProteins = 0;
-        double totalFats = 0;
-        double totalCarbs = 0;
-        double totalWeight = 0;
-
-        for (Food food : foods) {
-            totalCalories += food.getTotalCalories();
-            totalProteins += food.getTotalProteins();
-            totalFats += food.getTotalFats();
-            totalCarbs += food.getTotalCarbs();
-            totalWeight += food.getWeight();
-        }
-
-        if (totalWeight > 0) {
-            this.caloriesPerGram = totalCalories / totalWeight;
-            this.proteinsPerGram = totalProteins / totalWeight;
-            this.fatsPerGram = totalFats / totalWeight;
-            this.carbsPerGram = totalCarbs / totalWeight;
-            this.weight = totalWeight;
-        } else {
-            throw new InvalidInputException("Total weight must be greater than 0");
-        }
+        this.foods = foods;
     }
 }
-

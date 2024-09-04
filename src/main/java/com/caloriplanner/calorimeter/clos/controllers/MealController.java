@@ -34,12 +34,6 @@ public class MealController {
         return new ResponseEntity<>(meal, HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<MealDto> updateMeal(@PathVariable String id, @RequestBody MealDto mealDto) {
-        MealDto updatedMeal = mealService.updateMeal(id, mealDto);
-        return new ResponseEntity<>(updatedMeal, HttpStatus.OK);
-    }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteMealById(@PathVariable String id) {
         mealService.deleteMealById(id);

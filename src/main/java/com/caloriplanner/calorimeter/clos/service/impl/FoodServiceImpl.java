@@ -23,15 +23,22 @@ public class FoodServiceImpl implements FoodService {
     public FoodDto createFood(FoodDto foodDto) {
         Food food = FoodMapper.mapToFood(foodDto);
         Food savedFood = foodRepository.save(food);
-
         return FoodMapper.mapToFoodDto(savedFood);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<FoodDto> getAllFoods(){
+    public List<FoodDto> getAllFoods() {
         List<Food> foods = foodRepository.findAll();
         return foods.stream().map(FoodMapper::mapToFoodDto).toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public FoodDto getFoodById(String id) {
+        Food food = foodRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Food not found with id: " + id));
+        return FoodMapper.mapToFoodDto(food);
     }
 
     @Override
@@ -47,13 +54,9 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     @Transactional
-    public void deleteFood(String name) {
-        Food food = foodRepository.findByName(name);
-        if (food != null) {
-            foodRepository.deleteByName(name);
-        } else {
-            throw new ResourceNotFoundException("Food not found with name: " + name);
-        }
+    public void deleteFood(String id) {  // Update to delete by UUID
+        Food food = foodRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Food not found with id: " + id));
+        foodRepository.delete(food);
     }
 }
-

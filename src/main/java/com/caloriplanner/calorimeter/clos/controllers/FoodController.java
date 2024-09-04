@@ -17,26 +17,26 @@ public class FoodController {
     private FoodService foodService;
 
     @PostMapping("/create")
-    public ResponseEntity<FoodDto> createFood(@RequestBody FoodDto foodDto){
+    public ResponseEntity<FoodDto> createFood(@RequestBody FoodDto foodDto) {
         FoodDto savedFoodDto = foodService.createFood(foodDto);
         return new ResponseEntity<>(savedFoodDto, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<FoodDto>> getAllFood(){
+    public ResponseEntity<List<FoodDto>> getAllFood() {
         List<FoodDto> foodsDto = foodService.getAllFoods();
         return ResponseEntity.ok(foodsDto);
     }
 
-    @GetMapping("/{name}")
-    public ResponseEntity<FoodDto> getFoodByName(@PathVariable("name") String name){
-        FoodDto foodDto = foodService.getFoodByName(name);
+    @GetMapping("/{id}")
+    public ResponseEntity<FoodDto> getFoodById(@PathVariable("id") String id) {  // Update to retrieve by UUID
+        FoodDto foodDto = foodService.getFoodById(id);
         return ResponseEntity.ok(foodDto);
     }
 
-    @DeleteMapping("/{name}")
-    public ResponseEntity<String> deleteFood(@PathVariable("name") String name){
-        foodService.deleteFood(name);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteFood(@PathVariable("id") String id) {  // Update to delete by UUID
+        foodService.deleteFood(id);
         return ResponseEntity.ok("Food deleted successfully!");
     }
 }
