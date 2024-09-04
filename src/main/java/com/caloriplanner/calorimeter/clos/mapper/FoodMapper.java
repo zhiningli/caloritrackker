@@ -1,13 +1,15 @@
 package com.caloriplanner.calorimeter.clos.mapper;
 
-
 import com.caloriplanner.calorimeter.clos.models.Food;
 import com.caloriplanner.calorimeter.clos.models.dto.FoodDto;
 
+import java.util.UUID;
+
 public class FoodMapper {
 
-    public static FoodDto mapToFoodDto (Food food){
+    public static FoodDto mapToFoodDto(Food food) {
         return FoodDto.builder()
+                .id(food.getId())  // Map the UUID from the entity to the DTO
                 .name(food.getName())
                 .category(food.getCategory())
                 .caloriesPerGram(food.getCaloriesPerGram())
@@ -17,9 +19,10 @@ public class FoodMapper {
                 .build();
     }
 
-    public static Food mapToFood(FoodDto foodDto){
-        return Food.builder().
-                name(foodDto.getName())
+    public static Food mapToFood(FoodDto foodDto) {
+        return Food.builder()
+                .id(foodDto.getId() != null ? foodDto.getId() : UUID.randomUUID().toString())
+                .name(foodDto.getName())
                 .category(foodDto.getCategory())
                 .caloriesPerGram(foodDto.getCaloriesPerGram())
                 .proteinsPerGram(foodDto.getProteinsPerGram())
@@ -28,3 +31,4 @@ public class FoodMapper {
                 .build();
     }
 }
+

@@ -1,5 +1,6 @@
 package com.caloriplanner.calorimeter.clos.mapper;
 
+import com.caloriplanner.calorimeter.clos.exceptions.InvalidInputException;
 import com.caloriplanner.calorimeter.clos.exceptions.ResourceNotFoundException;
 import com.caloriplanner.calorimeter.clos.models.Meal;
 import com.caloriplanner.calorimeter.clos.models.dto.MealDto;
@@ -10,73 +11,101 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Component
 public class MealMapper {
 
-
     @Autowired
     FoodRepository foodRepository;
 
-    @Autowired
-    MealRepository mealRepository;
-
     public MealDto mapToMealDto(Meal meal) {
-
         Map<String, Double> foodNames = new HashMap<>();
 
-        if (meal.getFoods() != null){
-            for (Map.Entry<Food, Double> entry: meal.getFoods().entrySet()){
-                String foodName = entry.getKey().getName();
+        if (meal.getFoods() != null) {
+            for (Map.Entry<String, Double> entry : meal.getFoods().entrySet()) {
+                String foodID = entry.getKey();
                 Double weight = entry.getValue();
+
+                Food food = foodRepository.findById(foodID)
+                        .orElseThrow(() -> new ResourceNotFoundException("Food not found with id: " + foodID));
+
+                String foodName = food.getName();
                 foodNames.put(foodName, weight);
             }
         }
 
         return MealDto.builder()
+                .id(meal.getId())
                 .name(meal.getName())
                 .category(meal.getCategory())
-                .caloriesPerGram(meal.getCaloriesPerGram())
-                .proteinsPerGram(meal.getProteinsPerGram())
-                .fatsPerGram(meal.getFatsPerGram())
-                .carbsPerGram(meal.getCarbsPerGram())
                 .foodNames(foodNames)
                 .build();
     }
 
     public Meal mapToMeal(MealDto mealDto) {
-
-        Map<Food, Double> foods = new HashMap<>();
+        Map<String, Double> foods = new HashMap<>();
+        Map<String, Food> foodMap = new HashMap<>();
         Double totalWeight = 0.0;
 
-        if (mealDto.getFoodNames() != null){
+        if (mealDto.getFoodNames() != null) {
             for (Map.Entry<String, Double> entry : mealDto.getFoodNames().entrySet()) {
                 String foodName = entry.getKey();
                 Double weight = entry.getValue();
+
                 Food food = foodRepository.findByName(foodName);
-                if (food != null) {
-                    foods.put(food, weight);
-                    totalWeight += weight;
-                } else {
+                if (food == null) {
                     throw new ResourceNotFoundException("Food not found with name: " + foodName);
                 }
 
+                String foodID = food.getId();
+                foods.put(foodID, weight);
+                foodMap.put(foodID, food);
+                totalWeight += weight;
             }
         }
 
-        return Meal.builder()
+        Meal meal = Meal.builder()
+                .id(mealDto.getId() != null ? mealDto.getId() : UUID.randomUUID().toString())
                 .name(mealDto.getName())
                 .category(mealDto.getCategory())
-                .caloriesPerGram(mealDto.getCaloriesPerGram())
-                .proteinsPerGram(mealDto.getProteinsPerGram())
-                .carbsPerGram(mealDto.getCarbsPerGram())
-                .fatsPerGram(mealDto.getFatsPerGram())
                 .foods(foods)
                 .weight(totalWeight)
                 .build();
+
+        calculateNutritionalValues(meal, foodMap);
+
+        return meal;
+    }
+
+    private void calculateNutritionalValues(Meal meal, Map<String, Food> foodMap) {
+        double totalCalories = 0;
+        double totalProteins = 0;
+        double totalFats = 0;
+        double totalCarbs = 0;
+        double totalWeight = 0;
+
+        for (Map.Entry<String, Double> entry : meal.getFoods().entrySet()) {
+            String foodID = entry.getKey();
+            double weight = entry.getValue();
+
+            Food food = foodMap.get(foodID);
+            totalCalories += food.getCaloriesPerGram() * weight;
+            totalProteins += food.getProteinsPerGram() * weight;
+            totalFats += food.getFatsPerGram() * weight;
+            totalCarbs += food.getCarbsPerGram() * weight;
+            totalWeight += weight;
+        }
+
+        if (totalWeight > 0) {
+            meal.setCaloriesPerGram(totalCalories / totalWeight);
+            meal.setProteinsPerGram(totalProteins / totalWeight);
+            meal.setFatsPerGram(totalFats / totalWeight);
+            meal.setCarbsPerGram(totalCarbs / totalWeight);
+            meal.setWeight(totalWeight);
+        } else {
+            throw new InvalidInputException("Total weight must be greater than 0");
+        }
     }
 }
-

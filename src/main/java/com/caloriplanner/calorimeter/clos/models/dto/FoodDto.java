@@ -9,6 +9,7 @@ import lombok.*;
 @Builder
 public class FoodDto {
 
+    private String id;
     private String name;
     private FoodCategory category;
     private double caloriesPerGram;

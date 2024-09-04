@@ -66,10 +66,6 @@ public class MealServiceImplTest {
         mealDto = MealDto.builder()
                 .name("Fruit Salad")
                 .category(FoodCategory.FRUIT)
-                .caloriesPerGram(0.6)
-                .proteinsPerGram(0.02)
-                .fatsPerGram(0.01)
-                .carbsPerGram(0.14)
                 .foodNames(foodNames)
                 .build();
 

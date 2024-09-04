@@ -48,10 +48,6 @@ class MealControllerTest {
         mealDto = MealDto.builder()
                 .name("Fruit Salad")
                 .category(FoodCategory.COMPOSITE)
-                .caloriesPerGram(0.5)
-                .proteinsPerGram(0.02)
-                .fatsPerGram(0.01)
-                .carbsPerGram(0.13)
                 .foodNames(foodNames)
                 .build();
     }
@@ -98,7 +94,7 @@ class MealControllerTest {
 
     @Test
     void updateMealTest() throws Exception {
-        when(mealService.updateMeal(anyString(), any(MealDto.class))).thenReturn(mealDto);
+        when(mealService.updateMeal(any(MealDto.class))).thenReturn(mealDto);
 
         mockMvc.perform(put("/api/meals/{id}", "1")
                         .contentType(MediaType.APPLICATION_JSON)

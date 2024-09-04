@@ -7,6 +7,8 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -15,7 +17,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Food {
 
     @Id
-    private String id;
+    @Builder.Default
+    private String id = UUID.randomUUID().toString();
+
     private String name;
     private FoodCategory category;
     private double caloriesPerGram;
@@ -28,5 +32,5 @@ public class Food {
             throw new InvalidInputException("Nutritional values must be non-negative.");
         }
     }
-
 }
+

@@ -12,11 +12,9 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder
 public class MealDto {
+
+    private String id;
     private String name;
     private FoodCategory category;
-    private double caloriesPerGram;
-    private double proteinsPerGram;
-    private double fatsPerGram;
-    private double carbsPerGram;
-    private Map<String, Double> foodNames = new HashMap<>();
+    private Map<String, Double> foodNames;
 }

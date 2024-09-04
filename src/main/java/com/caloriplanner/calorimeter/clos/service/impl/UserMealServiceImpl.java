@@ -1,10 +1,11 @@
 package com.caloriplanner.calorimeter.clos.service.impl;
 
-import com.caloriplanner.calorimeter.clos.mapper.MealMapper;
-import com.caloriplanner.calorimeter.clos.models.Meal;
+import com.caloriplanner.calorimeter.clos.exceptions.ResourceNotFoundException;
+import com.caloriplanner.calorimeter.clos.mapper.UserMealMapper;
+import com.caloriplanner.calorimeter.clos.models.User;
 import com.caloriplanner.calorimeter.clos.models.UserMeal;
 import com.caloriplanner.calorimeter.clos.models.dto.MealDto;
-import com.caloriplanner.calorimeter.clos.repositories.MealRepository;
+import com.caloriplanner.calorimeter.clos.models.dto.UserMealDto;
 import com.caloriplanner.calorimeter.clos.repositories.UserMealRepository;
 import com.caloriplanner.calorimeter.clos.service.UserMealService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,42 +18,76 @@ import java.util.List;
 public class UserMealServiceImpl implements UserMealService {
 
     @Autowired
-    private MealRepository mealRepository;
-
-    @Autowired
     private UserMealRepository userMealRepository;
 
     @Autowired
-    private MealMapper mealMapper;
+    private UserMealMapper userMealMapper;
+
+    @Autowired
+    private MealServiceImpl mealService;
+
+    @Autowired
+    private UserLoginServiceImpl userService;
 
     @Override
     @Transactional
-    public void createUserMeal(String userId, MealDto mealDto, double weight) {
-        Meal meal = mealRepository.findByName(mealDto.getName());
+    public UserMealDto createUserMeal(String userSlug, MealDto mealDto) {
 
-        if (meal == null) {
-            meal = mealMapper.mapToMeal(mealDto);
-            meal = mealRepository.save(meal);
-        }
+        MealDto newMealDto = mealService.createMeal(mealDto);
 
-        UserMeal userMeal = UserMeal.builder()
-                .meal(meal)
-                .userId(userId)
-                .build();
+        UserMeal userMeal = userMealMapper.mapToUserMeal(userSlug, newMealDto);
 
         userMealRepository.save(userMeal);
+        return userMealMapper.mapToUserMealDto(userMeal);
     }
 
     @Override
     @Transactional
-    public List<UserMeal> getUserMeals(String userId) {
-        return userMealRepository.findByUserId(userId);
+    public List<UserMealDto> getUserMeals(String userSlug) {
+        User user = userService.getUserBySlug(userSlug);
+        String userId = user.getId();
+
+        List<UserMeal> userMeals = userMealRepository.findByUserId(userId);
+        return userMeals.stream().map(userMealMapper::mapToUserMealDto).toList();
     }
 
     @Override
     @Transactional
-    public void deleteUserMeal(String userId, String mealId) {
-        userMealRepository.deleteByUserIdAndMealId(userId, mealId);
+    public UserMealDto getUserMeal(String userSlug, MealDto mealDto) throws ResourceNotFoundException{
+        User user = userService.getUserBySlug(userSlug);
+        String userId = user.getId();
+        String mealId = mealDto.getId();
+
+        UserMeal userMeal = userMealRepository.findByUserIdAndMealId(userId, mealId);
+
+        return userMealMapper.mapToUserMealDto(userMeal);
     }
+
+
+    @Override
+    @Transactional
+    public void updateUserMeal(String userSlug, MealDto mealDto) throws ResourceNotFoundException {
+        User user = userService.getUserBySlug(userSlug);
+        String userId = user.getId();
+        String mealId = mealDto.getId();
+
+        UserMeal userMeal = userMealRepository.findByUserIdAndMealId(userId, mealId);
+
+        userMealRepository.delete(userMeal);
+        mealService.deleteMealById(mealId);
+        createUserMeal(userSlug, mealDto);
+    }
+
+    @Override
+    public void deleteUserMeal(String userSlug, MealDto mealDto) {
+        User user = userService.getUserBySlug(userSlug);
+        String userId = user.getId();
+        String mealId = mealDto.getId();
+
+        UserMeal userMeal = userMealRepository.findByUserIdAndMealId(userId, mealId);
+        userMealRepository.delete(userMeal);
+        mealService.deleteMealById(mealId);
+    }
+
 }
 

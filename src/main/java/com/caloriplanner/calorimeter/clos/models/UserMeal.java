@@ -5,20 +5,20 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
+import java.util.UUID;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Document(collection = "user_meals")
 public class UserMeal {
+
     @Id
-    private String id;
+    @Builder.Default
+    private String id = UUID.randomUUID().toString();
 
-    @DBRef
-    private Meal meal;  // Reference to the shared Meal object
-
-    private String userId;  // Reference to the user
-    private double weight;  // User-specific weight
-
+    private String mealId;
+    private String userId;
 }
 

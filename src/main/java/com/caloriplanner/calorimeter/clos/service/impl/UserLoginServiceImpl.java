@@ -1,5 +1,6 @@
 package com.caloriplanner.calorimeter.clos.service.impl;
 
+import com.caloriplanner.calorimeter.clos.exceptions.ResourceNotFoundException;
 import com.caloriplanner.calorimeter.clos.helpers.SlugHelper;
 import com.caloriplanner.calorimeter.clos.models.User;
 import com.caloriplanner.calorimeter.clos.models.dto.UserDto;
@@ -57,6 +58,13 @@ public class UserLoginServiceImpl implements UserLoginService {
         User user = userRepository.findByEmail(email);
         System.out.println("User found with email"+email);
         return user;
+    }
+
+
+    @Override
+    @Transactional
+    public User getUserBySlug(String slug) throws ResourceNotFoundException {
+        return userRepository.findBySlug(slug);
     }
 
     @Override
