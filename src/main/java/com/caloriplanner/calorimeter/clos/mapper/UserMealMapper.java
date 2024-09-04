@@ -9,6 +9,8 @@ import com.caloriplanner.calorimeter.clos.models.dto.UserMealDto;
 import com.caloriplanner.calorimeter.clos.models.Meal;
 import com.caloriplanner.calorimeter.clos.repositories.MealRepository;
 import com.caloriplanner.calorimeter.clos.repositories.UserRepository;
+import com.caloriplanner.calorimeter.clos.service.impl.MealServiceImpl;
+import com.caloriplanner.calorimeter.clos.service.impl.UserLoginServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -18,24 +20,18 @@ import java.util.UUID;
 public class UserMealMapper {
 
     @Autowired
-    UserRepository userRepository;
+    UserLoginServiceImpl userService;
 
     @Autowired
-    MealRepository mealRepository;
-
-    @Autowired
-    MealMapper mealMapper;
+    MealServiceImpl mealService;
 
     public UserMealDto mapToUserMealDto(UserMeal userMeal){
 
         String mealID = userMeal.getMealId();
-        Meal meal = mealRepository.findById(mealID).orElseThrow(
-                () -> new ResourceNotFoundException("No meal with id "+mealID+" found!"));
-        MealDto mealDto= mealMapper.mapToMealDto(meal);
+        MealDto mealDto = mealService.getMealById(mealID);
 
         String userID = userMeal.getUserId();
-        User user = userRepository.findById(userID).orElseThrow(
-                () -> new ResourceNotFoundException("No user with id "+userID+" found!"));
+        User user = userService.getUserById(userID);
 
         String userSlug = user.getSlug();
 
@@ -48,11 +44,10 @@ public class UserMealMapper {
 
     public UserMeal mapToUserMeal(UserMealDto userMealDto){
         MealDto mealDto = userMealDto.getMealDto();
-        Meal meal = mealMapper.mapToMeal(mealDto);
-        String mealID = meal.getId();
+        String mealID = mealDto.getId();
 
         String userSlug = userMealDto.getUserSlug();
-        User user = userRepository.findBySlug(userSlug);
+        User user = userService.getUserBySlug(userSlug);
         String userID = user.getId();
 
         return UserMeal.builder()
@@ -66,7 +61,7 @@ public class UserMealMapper {
 
         String mealID = mealDto.getId();
 
-        User user = userRepository.findBySlug(userSlug);
+        User user = userService.getUserBySlug(userSlug);
         String userID = user.getId();
 
         return UserMeal.builder()

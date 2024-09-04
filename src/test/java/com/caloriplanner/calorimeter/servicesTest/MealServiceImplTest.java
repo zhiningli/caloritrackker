@@ -77,10 +77,6 @@ public class MealServiceImplTest {
                 .name("Fruit Salad")
                 .category(FoodCategory.FRUIT)
                 .foods(foods)
-                .caloriesPerGram(0.6)
-                .proteinsPerGram(0.02)
-                .fatsPerGram(0.01)
-                .carbsPerGram(0.14)
                 .build();
     }
 

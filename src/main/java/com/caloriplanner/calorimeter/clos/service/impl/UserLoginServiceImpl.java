@@ -60,6 +60,14 @@ public class UserLoginServiceImpl implements UserLoginService {
         return user;
     }
 
+    @Override
+    @Transactional
+    public User getUserById(String id) throws ResourceNotFoundException {
+        return userRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("User not found!")
+        );
+    }
+
 
     @Override
     @Transactional

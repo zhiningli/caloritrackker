@@ -2,12 +2,14 @@ package com.caloriplanner.calorimeter.clos.mapper;
 
 import com.caloriplanner.calorimeter.clos.models.Food;
 import com.caloriplanner.calorimeter.clos.models.dto.FoodDto;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
+@Component
 public class FoodMapper {
 
-    public static FoodDto mapToFoodDto(Food food) {
+    public FoodDto mapToFoodDto(Food food) {
         return FoodDto.builder()
                 .id(food.getId())  // Map the UUID from the entity to the DTO
                 .name(food.getName())
@@ -19,7 +21,7 @@ public class FoodMapper {
                 .build();
     }
 
-    public static Food mapToFood(FoodDto foodDto) {
+    public Food mapToFood(FoodDto foodDto) {
         return Food.builder()
                 .id(foodDto.getId() != null ? foodDto.getId() : UUID.randomUUID().toString())
                 .name(foodDto.getName())
