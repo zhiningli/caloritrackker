@@ -1,14 +1,9 @@
 package com.caloriplanner.calorimeter.clos.mapper;
 
-
-import com.caloriplanner.calorimeter.clos.exceptions.ResourceNotFoundException;
 import com.caloriplanner.calorimeter.clos.models.UserMeal;
 import com.caloriplanner.calorimeter.clos.models.User;
 import com.caloriplanner.calorimeter.clos.models.dto.MealDto;
 import com.caloriplanner.calorimeter.clos.models.dto.UserMealDto;
-import com.caloriplanner.calorimeter.clos.models.Meal;
-import com.caloriplanner.calorimeter.clos.repositories.MealRepository;
-import com.caloriplanner.calorimeter.clos.repositories.UserRepository;
 import com.caloriplanner.calorimeter.clos.service.impl.MealServiceImpl;
 import com.caloriplanner.calorimeter.clos.service.impl.UserLoginServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
