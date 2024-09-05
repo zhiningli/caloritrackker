@@ -6,6 +6,7 @@ import com.caloriplanner.calorimeter.clos.models.dto.MealDto;
 import com.caloriplanner.calorimeter.clos.models.dto.UserMealDto;
 import com.caloriplanner.calorimeter.clos.service.UserMealService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,11 +21,11 @@ public class UserMealController {
 
 
     @PostMapping("/createMeal")
-    public ResponseEntity<Void> createMeal(@PathVariable String userSlug,
+    public ResponseEntity<UserMealDto> createMeal(@PathVariable String userSlug,
                                            @RequestBody MealDto mealDto) {
 
-        userMealService.createUserMeal(userSlug, mealDto);
-        return ResponseEntity.ok().build();
+        UserMealDto savedUserMealDto = userMealService.createUserMeal(userSlug, mealDto);
+        return new ResponseEntity<>(savedUserMealDto, HttpStatus.CREATED);
     }
 
     @GetMapping

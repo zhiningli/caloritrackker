@@ -38,6 +38,7 @@ public class UserMealServiceImpl implements UserMealService {
         UserMeal userMeal = userMealMapper.mapToUserMeal(userSlug, newMealDto);
 
         userMealRepository.save(userMeal);
+
         return userMealMapper.mapToUserMealDto(userMeal);
     }
 

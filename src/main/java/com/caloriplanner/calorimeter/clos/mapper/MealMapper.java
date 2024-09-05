@@ -4,7 +4,6 @@ import com.caloriplanner.calorimeter.clos.exceptions.InvalidInputException;
 import com.caloriplanner.calorimeter.clos.models.Meal;
 import com.caloriplanner.calorimeter.clos.models.dto.FoodDto;
 import com.caloriplanner.calorimeter.clos.models.dto.MealDto;
-import com.caloriplanner.calorimeter.clos.models.Food;
 import com.caloriplanner.calorimeter.clos.service.impl.FoodServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,12 +24,15 @@ public class MealMapper {
     public MealDto mapToMealDto(Meal meal) {
         Map<String, Double> foodNames = new HashMap<>();
 
+
         if (meal.getFoods() != null) {
             for (Map.Entry<String, Double> entry : meal.getFoods().entrySet()) {
                 String foodID = entry.getKey();
                 Double weight = entry.getValue();
-                FoodDto food = foodService.getFoodById(foodID);
-                String foodName = food.getName();
+
+                FoodDto foodDto = foodService.getFoodById(foodID);
+
+                String foodName = foodDto.getName();
                 foodNames.put(foodName, weight);
             }
         }
@@ -38,6 +40,11 @@ public class MealMapper {
         return MealDto.builder()
                 .id(meal.getId())
                 .name(meal.getName())
+                .caloriesPerGram(meal.getCaloriesPerGram())
+                .proteinsPerGram(meal.getProteinsPerGram())
+                .fatsPerGram(meal.getFatsPerGram())
+                .carbsPerGram(meal.getCarbsPerGram())
+                .weight(meal.getWeight())
                 .category(meal.getCategory())
                 .foodNames(foodNames)
                 .build();
@@ -45,7 +52,7 @@ public class MealMapper {
 
     public Meal mapToMeal(MealDto mealDto) {
         Map<String, Double> foods = new HashMap<>();
-        Map<String, Food> foodMap = new HashMap<>();
+        Map<String, FoodDto> foodMap = new HashMap<>();
         Double totalWeight = 0.0;
 
         if (mealDto.getFoodNames() != null) {
@@ -54,11 +61,10 @@ public class MealMapper {
                 Double weight = entry.getValue();
 
                 FoodDto foodDto = foodService.getFoodByName(foodName);
-                Food food = foodMapper.mapToFood(foodDto);
 
-                String foodID = food.getId();
+                String foodID = foodDto.getId();
                 foods.put(foodID, weight);
-                foodMap.put(foodID, food);
+                foodMap.put(foodID, foodDto);
                 totalWeight += weight;
             }
         }
@@ -76,7 +82,7 @@ public class MealMapper {
         return meal;
     }
 
-    private void calculateNutritionalValues(Meal meal, Map<String, Food> foodMap) {
+    private void calculateNutritionalValues(Meal meal, Map<String, FoodDto> foodMap) {
         double totalCalories = 0;
         double totalProteins = 0;
         double totalFats = 0;
@@ -87,7 +93,7 @@ public class MealMapper {
             String foodID = entry.getKey();
             double weight = entry.getValue();
 
-            Food food = foodMap.get(foodID);
+            FoodDto food = foodMap.get(foodID);
             totalCalories += food.getCaloriesPerGram() * weight;
             totalProteins += food.getProteinsPerGram() * weight;
             totalFats += food.getFatsPerGram() * weight;
