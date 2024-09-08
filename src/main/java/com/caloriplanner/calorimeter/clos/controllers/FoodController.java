@@ -29,13 +29,13 @@ public class FoodController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FoodDto> getFoodById(@PathVariable("id") String id) {  // Update to retrieve by UUID
+    public ResponseEntity<FoodDto> getFoodById(@PathVariable("id") String id) {
         FoodDto foodDto = foodService.getFoodById(id);
         return ResponseEntity.ok(foodDto);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteFood(@PathVariable("id") String id) {  // Update to delete by UUID
+    public ResponseEntity<String> deleteFood(@PathVariable("id") String id) {
         foodService.deleteFood(id);
         return ResponseEntity.ok("Food deleted successfully!");
     }
