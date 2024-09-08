@@ -10,6 +10,7 @@ import java.util.List;
 
 public interface UserMealService {
     UserMealDto createUserMeal(String userSlug, MealDto mealDto);
+    List<UserMealDto> createUserMeals(String userSlug, List<MealDto> mealDtoList);
     List<UserMealDto> getUserMeals(String userSlug);
     UserMealDto getUserMeal(String userSlug, MealDto mealDto);
     void updateUserMeal(String userSlug, MealDto mealDto);

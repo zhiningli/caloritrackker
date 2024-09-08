@@ -1,10 +1,8 @@
 package com.caloriplanner.calorimeter.clos.models.dto;
 
-import com.caloriplanner.calorimeter.clos.constants.FoodCategory;
-import com.caloriplanner.calorimeter.clos.models.Food;
+import com.caloriplanner.calorimeter.clos.constants.MealCategory;
 import lombok.*;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @Data
@@ -15,11 +13,16 @@ public class MealDto {
 
     private String id;
     private String name;
-    private FoodCategory category;
+    private MealCategory category;
     private double caloriesPerGram;
     private double proteinsPerGram;
     private double fatsPerGram;
     private double carbsPerGram;
     private double weight;
+
+    private String comsumptionDate;
+    private String comsumptionTime;
+    private String timeStamp;
+
     private Map<String, Double> foodNames;
 }

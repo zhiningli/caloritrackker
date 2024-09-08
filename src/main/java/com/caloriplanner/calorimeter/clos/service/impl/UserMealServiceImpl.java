@@ -9,9 +9,11 @@ import com.caloriplanner.calorimeter.clos.models.dto.UserMealDto;
 import com.caloriplanner.calorimeter.clos.repositories.UserMealRepository;
 import com.caloriplanner.calorimeter.clos.service.UserMealService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -40,6 +42,32 @@ public class UserMealServiceImpl implements UserMealService {
         userMealRepository.save(userMeal);
 
         return userMealMapper.mapToUserMealDto(userMeal);
+    }
+
+    @Override
+    @Transactional
+    public List<UserMealDto> createUserMeals(String userSlug, List<MealDto> mealDtoList) {
+        List<UserMeal> userMealsToSave = new ArrayList<>();
+        List<UserMealDto> savedUserMealDtoList = new ArrayList<>();
+        System.out.println("I am in the createUserMeals function");
+        try {
+            for (MealDto mealDto : mealDtoList) {
+                MealDto newMealDto = mealService.createMeal(mealDto);
+                UserMeal userMeal = userMealMapper.mapToUserMeal(userSlug, newMealDto);
+                userMealsToSave.add(userMeal);
+            }
+            List<UserMeal> savedUserMeals = userMealRepository.saveAll(userMealsToSave);
+            for (UserMeal savedUserMeal : savedUserMeals) {
+                savedUserMealDtoList.add(userMealMapper.mapToUserMealDto(savedUserMeal));
+            }
+
+            return savedUserMealDtoList;
+
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while saving meals: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected error occurred: " + e.getMessage(), e);
+        }
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -26,6 +27,17 @@ public class UserMealController {
 
         UserMealDto savedUserMealDto = userMealService.createUserMeal(userSlug, mealDto);
         return new ResponseEntity<>(savedUserMealDto, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/createMealsByBatch")
+    public ResponseEntity<List<UserMealDto>> createMealsByBatch(@PathVariable String userSlug,
+                                                                @RequestBody List<MealDto> mealDtoList) {
+        try {
+            List<UserMealDto> savedUserMealDtoList = userMealService.createUserMeals(userSlug, mealDtoList);
+            return new ResponseEntity<>(savedUserMealDtoList, HttpStatus.CREATED);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @GetMapping

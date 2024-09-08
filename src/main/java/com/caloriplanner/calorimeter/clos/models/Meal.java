@@ -1,6 +1,6 @@
 package com.caloriplanner.calorimeter.clos.models;
 
-import com.caloriplanner.calorimeter.clos.constants.FoodCategory;
+import com.caloriplanner.calorimeter.clos.constants.MealCategory;
 import com.caloriplanner.calorimeter.clos.exceptions.InvalidInputException;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,7 +25,7 @@ public class Meal {
     private String id = UUID.randomUUID().toString();
 
     private String name;
-    private FoodCategory category;
+    private MealCategory category;
 
     @Builder.Default
     private Map<String, Double> foods = new HashMap<>();
@@ -36,8 +36,12 @@ public class Meal {
     private double carbsPerGram;
     private double weight;
 
+    private String comsumptionDate;
+    private String comsumptionTime;
+    private String timeStamp;
+
     @Builder
-    public Meal(String name, FoodCategory category, Map<String, Double> foods, Double weight) {
+    public Meal(String name, MealCategory category, Map<String, Double> foods, Double weight) {
         this.name = name;
         this.category = category;
         this.foods = foods != null ? foods : new HashMap<>();

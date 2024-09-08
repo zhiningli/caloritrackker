@@ -47,6 +47,9 @@ public class MealMapper {
                 .weight(meal.getWeight())
                 .category(meal.getCategory())
                 .foodNames(foodNames)
+                .comsumptionTime(meal.getComsumptionTime())
+                .comsumptionDate(meal.getComsumptionDate())
+                .timeStamp(meal.getTimeStamp())
                 .build();
     }
 
