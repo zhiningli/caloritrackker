@@ -32,6 +32,7 @@ public class UserMealController {
     @PostMapping("/createMealsByBatch")
     public ResponseEntity<List<UserMealDto>> createMealsByBatch(@PathVariable String userSlug,
                                                                 @RequestBody List<MealDto> mealDtoList) {
+
         try {
             List<UserMealDto> savedUserMealDtoList = userMealService.createUserMeals(userSlug, mealDtoList);
             return new ResponseEntity<>(savedUserMealDtoList, HttpStatus.CREATED);

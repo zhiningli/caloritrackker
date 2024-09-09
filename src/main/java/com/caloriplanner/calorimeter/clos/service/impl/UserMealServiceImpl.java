@@ -49,9 +49,9 @@ public class UserMealServiceImpl implements UserMealService {
     public List<UserMealDto> createUserMeals(String userSlug, List<MealDto> mealDtoList) {
         List<UserMeal> userMealsToSave = new ArrayList<>();
         List<UserMealDto> savedUserMealDtoList = new ArrayList<>();
-        System.out.println("I am in the createUserMeals function");
         try {
             for (MealDto mealDto : mealDtoList) {
+                System.out.println("mealDto extracted from the mealDtoList"+mealDto);
                 MealDto newMealDto = mealService.createMeal(mealDto);
                 UserMeal userMeal = userMealMapper.mapToUserMeal(userSlug, newMealDto);
                 userMealsToSave.add(userMeal);

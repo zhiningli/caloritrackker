@@ -36,8 +36,8 @@ public class Meal {
     private double carbsPerGram;
     private double weight;
 
-    private String comsumptionDate;
-    private String comsumptionTime;
+    private String consumptionDate;
+    private String consumptionTime;
     private String timeStamp;
 
     @Builder
