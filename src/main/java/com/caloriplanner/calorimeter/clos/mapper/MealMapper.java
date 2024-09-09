@@ -47,8 +47,8 @@ public class MealMapper {
                 .weight(meal.getWeight())
                 .category(meal.getCategory())
                 .foodNames(foodNames)
-                .comsumptionTime(meal.getComsumptionTime())
-                .comsumptionDate(meal.getComsumptionDate())
+                .consumptionTime(meal.getConsumptionTime())
+                .consumptionDate(meal.getConsumptionDate())
                 .timeStamp(meal.getTimeStamp())
                 .build();
     }
@@ -78,6 +78,9 @@ public class MealMapper {
                 .category(mealDto.getCategory())
                 .foods(foods)
                 .weight(totalWeight)
+                .consumptionDate(mealDto.getConsumptionDate())
+                .consumptionTime(mealDto.getConsumptionTime())
+                .timeStamp(mealDto.getTimeStamp())
                 .build();
 
         calculateNutritionalValues(meal, foodMap);

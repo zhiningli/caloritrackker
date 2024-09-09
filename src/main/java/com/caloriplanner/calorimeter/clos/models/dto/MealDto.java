@@ -20,8 +20,8 @@ public class MealDto {
     private double carbsPerGram;
     private double weight;
 
-    private String comsumptionDate;
-    private String comsumptionTime;
+    private String consumptionDate;
+    private String consumptionTime;
     private String timeStamp;
 
     private Map<String, Double> foodNames;
