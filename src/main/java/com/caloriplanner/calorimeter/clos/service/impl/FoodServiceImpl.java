@@ -31,9 +31,13 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<FoodDto> getAllFoods() {
+    public List<FoodDto> getAllFoods(int limit) {
         List<Food> foods = foodRepository.findAll();
-        return foods.stream().map(foodMapper::mapToFoodDto).toList();
+
+        return foods.stream()
+                .limit(limit) // Limit the number of results
+                .map(foodMapper::mapToFoodDto)
+                .toList();
     }
 
     @Override
@@ -57,7 +61,7 @@ public class FoodServiceImpl implements FoodService {
 
     @Override
     @Transactional
-    public void deleteFood(String id) {  // Update to delete by UUID
+    public void deleteFood(String id) {
         Food food = foodRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Food not found with id: " + id));
         foodRepository.delete(food);
