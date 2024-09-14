@@ -36,9 +36,7 @@ public class UserMealServiceImpl implements UserMealService {
     public UserMealDto createUserMeal(String userSlug, MealDto mealDto) {
 
         MealDto newMealDto = mealService.createMeal(mealDto);
-
         UserMeal userMeal = userMealMapper.mapToUserMeal(userSlug, newMealDto);
-
         userMealRepository.save(userMeal);
 
         return userMealMapper.mapToUserMealDto(userMeal);
@@ -95,17 +93,47 @@ public class UserMealServiceImpl implements UserMealService {
 
     @Override
     @Transactional
-    public void updateUserMeal(String userSlug, MealDto mealDto) throws ResourceNotFoundException {
+    public UserMealDto updateUserMeal(String userSlug, MealDto mealDto) throws ResourceNotFoundException {
         User user = userService.getUserBySlug(userSlug);
         String userId = user.getId();
         String mealId = mealDto.getId();
 
+        // Obtain the right userMeal from the repository and delete it
         UserMeal userMeal = userMealRepository.findByUserIdAndMealId(userId, mealId);
-
         userMealRepository.delete(userMeal);
-        mealService.deleteMealById(mealId);
-        createUserMeal(userSlug, mealDto);
+
+        // Update meal in mealRepository as well and create a newUserMeal, save it to the repository
+        MealDto newMealDto = mealService.updateMeal(mealDto);
+        UserMeal newUserMeal = userMealMapper.mapToUserMeal(userSlug, newMealDto);
+        userMealRepository.save(newUserMeal);
+
+        return userMealMapper.mapToUserMealDto(userMeal);
     }
+
+    @Override
+    public List<UserMealDto> updateUserMeals(String userSlug, List<MealDto> mealDtoList) {
+        List<UserMeal> userMealsToUpdate = new ArrayList<>();
+        List<UserMealDto> updatedUserMealDtoList = new ArrayList<>();
+        try {
+            for (MealDto mealDto : mealDtoList) {
+                System.out.println("mealDto extracted from the mealDtoList"+mealDto);
+                MealDto newMealDto = mealService.updateMeal(mealDto);
+                UserMeal userMeal = userMealMapper.mapToUserMeal(userSlug, newMealDto);
+                userMealsToUpdate.add(userMeal);
+            }
+            List<UserMeal> updatedUserMeals = userMealRepository.saveAll(userMealsToUpdate);
+            userMealRepository.deleteAll(userMealsToUpdate);
+            for (UserMeal savedUserMeal : updatedUserMeals) {
+                updatedUserMealDtoList.add(userMealMapper.mapToUserMealDto(savedUserMeal));
+            }
+            return updatedUserMealDtoList;
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Error occurred while saving meals: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Unexpected error occurred: " + e.getMessage(), e);
+        }
+    }
+
 
     @Override
     public void deleteUserMeal(String userSlug, MealDto mealDto) {
