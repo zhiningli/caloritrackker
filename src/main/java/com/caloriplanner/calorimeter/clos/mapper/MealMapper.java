@@ -72,8 +72,12 @@ public class MealMapper {
             }
         }
 
+
+        String finalId = generateUUID(mealDto.getId());
+
+
         Meal meal = Meal.builder()
-                .id(mealDto.getId() != null ? mealDto.getId() : UUID.randomUUID().toString())
+                .id(finalId)
                 .name(mealDto.getName())
                 .category(mealDto.getCategory())
                 .foods(foods)
@@ -116,5 +120,12 @@ public class MealMapper {
         } else {
             throw new InvalidInputException("Total weight must be greater than 0");
         }
+    }
+
+    private String generateUUID(String id) {
+        if (id != null && id.startsWith("temp-")) {
+            return UUID.randomUUID().toString();
+        }
+        return id;
     }
 }

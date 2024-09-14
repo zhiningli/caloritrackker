@@ -13,7 +13,8 @@ public interface UserMealService {
     List<UserMealDto> createUserMeals(String userSlug, List<MealDto> mealDtoList);
     List<UserMealDto> getUserMeals(String userSlug);
     UserMealDto getUserMeal(String userSlug, MealDto mealDto);
-    void updateUserMeal(String userSlug, MealDto mealDto);
+    UserMealDto updateUserMeal(String userSlug, MealDto mealDto);
+    List<UserMealDto> updateUserMeals(String userSlug, List<MealDto> mealDtoList);
     void deleteUserMeal(String userSlug, MealDto mealDto);
 
 }
