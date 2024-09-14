@@ -23,8 +23,8 @@ public class FoodController {
     }
 
     @GetMapping
-    public ResponseEntity<List<FoodDto>> getAllFood() {
-        List<FoodDto> foodsDto = foodService.getAllFoods();
+    public ResponseEntity<List<FoodDto>> getAllFood(@RequestParam(required = false, defaultValue = "2000") int limit) {
+        List<FoodDto> foodsDto = foodService.getAllFoods(limit);
         return ResponseEntity.ok(foodsDto);
     }
 

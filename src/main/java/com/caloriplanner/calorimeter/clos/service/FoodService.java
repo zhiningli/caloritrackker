@@ -7,8 +7,9 @@ import java.util.List;
 
 public interface FoodService {
     FoodDto createFood(FoodDto foodDto);
-    List<FoodDto> getAllFoods();
+    List<FoodDto> getAllFoods(int limit);  // Updated method signature
     FoodDto getFoodById(String id);
     FoodDto getFoodByName(String name);
-    void deleteFood(String name);
+    void deleteFood(String id);
 }
+

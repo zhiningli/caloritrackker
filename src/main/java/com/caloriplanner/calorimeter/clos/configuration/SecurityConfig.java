@@ -34,14 +34,13 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Disable CSRF for simplicity
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/users/register", "/api/users/login").permitAll() // Allow unauthenticated access to /register and /login
+                        .requestMatchers("/api/users/register", "/api/users/login", "/api/foods").permitAll() // Allow unauthenticated access to /register and /login
                         .anyRequest().authenticated()
                 )
                 .cors(withDefaults()) // Enable CORS
                 .formLogin(withDefaults()) // Enable default form login
                 .httpBasic(withDefaults()); // Enable basic authentication
 
-        // Add the JwtRequestFilter before UsernamePasswordAuthenticationFilter
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
