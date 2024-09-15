@@ -72,9 +72,7 @@ public class MealMapper {
             }
         }
 
-
         String finalId = generateUUID(mealDto.getId());
-
 
         Meal meal = Meal.builder()
                 .id(finalId)

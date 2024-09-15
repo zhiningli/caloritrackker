@@ -146,5 +146,14 @@ public class UserMealServiceImpl implements UserMealService {
         mealService.deleteMealById(mealId);
     }
 
+    @Override
+    public void deleteUserMeals(String userSlug, List<MealDto> mealDtoList) {
+        User user = userService.getUserBySlug(userSlug);
+        String userId = user.getId();
+        for (MealDto mealDto : mealDtoList) {
+            userMealRepository.deleteByUserIdAndMealId(userId, mealDto.getId());
+        }
+        mealService.deleteMealsByBatch(mealDtoList);
+    }
 }
 

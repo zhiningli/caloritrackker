@@ -16,5 +16,5 @@ public interface UserMealService {
     UserMealDto updateUserMeal(String userSlug, MealDto mealDto);
     List<UserMealDto> updateUserMeals(String userSlug, List<MealDto> mealDtoList);
     void deleteUserMeal(String userSlug, MealDto mealDto);
-
+    void deleteUserMeals(String userSlug, List<MealDto> mealDtoList);
 }
