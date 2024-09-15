@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MealServiceImpl implements MealService {
@@ -77,6 +78,19 @@ public class MealServiceImpl implements MealService {
             mealRepository.delete(meal);
         } else {
             throw new ResourceNotFoundException("Unable to find meal with name " + name +", unable to perform deletion");
+        }
+    }
+
+    @Override
+    public void deleteMealsByBatch(List<MealDto> mealDtoList) {
+        try {
+            List<Meal> mealList = mealDtoList.stream()
+                    .map(mealDto -> mealMapper.mapToMeal(mealDto))
+                    .collect(Collectors.toList());
+            System.out.println(mealList);
+            mealRepository.deleteAll(mealList);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete meals by batch", e);
         }
     }
 }

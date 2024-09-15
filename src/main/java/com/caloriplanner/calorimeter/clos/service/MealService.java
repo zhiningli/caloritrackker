@@ -13,5 +13,6 @@ public interface MealService {
     MealDto updateMeal(MealDto newMealDto);
     void deleteMealById(String id);
     void deleteMealByName(String name);
+    void deleteMealsByBatch(List<MealDto> mealDtoList);
 
 }

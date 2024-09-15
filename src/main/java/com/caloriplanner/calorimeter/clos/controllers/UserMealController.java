@@ -65,8 +65,20 @@ public class UserMealController {
     @DeleteMapping("/deleteMeal")
     public ResponseEntity<Void> deleteUserMeal(@PathVariable String userSlug,
                                                @RequestBody MealDto mealDto) {
-
         userMealService.deleteUserMeal(userSlug, mealDto);
         return ResponseEntity.ok().build();
+    }
+
+
+    @DeleteMapping("/deleteMealsByBatch")
+    public ResponseEntity<Void> deleteMealsByBatch(@PathVariable String userSlug,
+                                                   @RequestBody List<MealDto> mealDtoList){
+        System.out.println("MealDtoList passed to the backend: "+ mealDtoList);
+        try {
+            userMealService.deleteUserMeals(userSlug, mealDtoList);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
