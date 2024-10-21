@@ -1,9 +1,11 @@
 package com.caloriplanner.calorimeter.clos.models;
 
+import com.caloriplanner.calorimeter.clos.models.dto.HealthMetricsDto;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.index.Indexed;
+
 
 @Data
 @NoArgsConstructor
@@ -21,4 +23,7 @@ public class User {
 
     @Indexed(unique = true)
     private String slug;
+
+    private HealthMetricsDto healthMetrics;
 }
+
